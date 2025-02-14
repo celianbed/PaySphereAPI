@@ -5,7 +5,7 @@ import re
 class User(db.Model):
     __tablename__ = 'users'
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True,autoincrement=True)
     nom = db.Column(db.String(255), nullable=False)
     prenom = db.Column(db.String(255), nullable=False)
     email = db.Column(db.Text, unique=True, nullable=False)
@@ -13,6 +13,8 @@ class User(db.Model):
     date_creation = db.Column(db.Date, nullable=False)
     mise_a_jour = db.Column(db.DateTime, nullable=True)
     active = db.Column(db.Boolean, default=True)
+
+    client = db.relationship("Client", uselist=False, back_populates="user")
 
     def __init__(self, nom, prenom, email, username, date_creation, mise_a_jour=None, active=True):
         self.name = nom

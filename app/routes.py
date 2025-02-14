@@ -7,9 +7,9 @@ api = Blueprint('PaySphereAPI', __name__)
 
 @api.route('/')
 def home():
-    return "Hello, API Flask fonctionne !"
+    return "Bienvenue sur l'API PaySphereDB, documentation : "
 
-@api.route('/all_users', methods=['GET'])
+@api.route('/users', methods=['GET'])
 def all_users():
     users =  UserController.get_all_users()
     return jsonify([u.to_dict() for u in users])

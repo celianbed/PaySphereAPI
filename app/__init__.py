@@ -10,6 +10,7 @@ def create_app():
 
     db.init_app(app)
 
+
     from app.routes import api
     app.register_blueprint(api, url_prefix='/PaySphereAPI')
 
