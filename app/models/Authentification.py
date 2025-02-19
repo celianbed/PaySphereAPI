@@ -4,9 +4,12 @@ class Authentification(db.Model):
 
     __tablename__ = 'authentification'
 
+
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
     mot_de_passe_hash = db.Column(db.String(255), nullable=False)
     derniere_connexion = db.Column(db.DateTime, nullable=True)
+
+    user = db.relationship("User", back_populates="authentification")
 
 
     def __init__(self, user_id, client_id, mot_de_passe_hash, derniere_connexion):

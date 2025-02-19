@@ -4,7 +4,7 @@ class Client(db.Model):
 
     __tablename__ = 'client'
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), unique=True)
     nom = db.Column(db.String(100), nullable=False)
     prenom = db.Column(db.String(100), nullable=False)
@@ -13,9 +13,9 @@ class Client(db.Model):
     numero_de_telephone = db.Column(db.String(20), nullable=False)
     date_naissance = db.Column(db.Date, nullable=False)
 
-    comptes = db.relationship("Comptes", back_populates="client")
-    notifications = db.relationship("Notifications",secondary="notification_clients", back_populates="clients")
-    prets = db.relationship("Prets", back_populates="client")
+    comptes = db.relationship("Compte", back_populates="client")
+    notifications = db.relationship("Notification",secondary="notification_clients", back_populates="clients")
+    prets = db.relationship("Pret", back_populates="client")
     user = db.relationship("User", back_populates="client")
 
     def __init__(self, client_id, user_id, nom, prenom, email, adresse, numero_de_telephone, date_naissance):

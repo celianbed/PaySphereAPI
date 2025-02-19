@@ -4,7 +4,7 @@ class Rib(db.Model):
 
     __tablename__ = 'rib'
 
-    id = db.Column(db.Integer, primary_key=True,autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True)
     compte_id = db.Column(db.Integer, db.ForeignKey('compte.id'))
     iban = db.Column(db.String(34), unique=True, nullable=False)
     bic = db.Column(db.String(11), nullable=False)

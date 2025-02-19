@@ -4,17 +4,17 @@ class Transaction(db.Model):
 
     __tablename__ = 'transactions'
 
-    id = db.Column(db.Integer, primary_key=True,autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True)
     compte_id = db.Column(db.Integer, db.ForeignKey('compte.id'))
     montant = db.Column(db.Numeric(15,2), nullable=False)
+    statit_id= db.Column(db.Integer, db.ForeignKey('statut.id'))
     date_transaction = db.Column(db.DateTime, nullable=False)
     type_transaction = db.Column(db.String(20), nullable=False)
     description = db.Column(db.Text, nullable=False)
     compte_destinataire = db.Column(db.Integer, nullable=False)
 
     compte = db.relationship("Compte", back_populates="transactions")
-    virement = db.relationship("Compte", back_populates="virements")
-
+    statut = db.relationship("Statut", back_populates="transactions")
 
     def __init__(self, client_id, user_id, nom, prenom, email, date_naissance, statut):
         self.client_id = client_id

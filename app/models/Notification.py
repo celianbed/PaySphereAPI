@@ -4,7 +4,7 @@ from app import db
 class Notification(db.Model):
     __tablename__ = 'notification'
 
-    id = db.Column(db.Integer, primary_key=True,autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True)
     client_id = db.Column(db.Integer, db.ForeignKey('client.id'))
     type_notification = db.Column(db.String(50), nullable=False)
     message = db.Column(db.Text, nullable=False)

@@ -1,10 +1,11 @@
 from app import db
+from app.models.Virement import Virement  # Import pour éviter référence circulaire
 
 class Compte(db.Model):
 
     __tablename__ = "compte"
 
-    id = db.Column(db.Integer, primary_key=True,autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True)
     client_id = db.Column(db.Integer, db.ForeignKey('client.id'))
     type_compte_id = db.Column(db.Integer, db.ForeignKey('type_compte.id'), nullable=False)
     solde = db.Column(db.Numeric(15,2), nullable=False)
@@ -14,6 +15,12 @@ class Compte(db.Model):
     client = db.relationship("Client", uselist=False, back_populates="comptes")
     transactions = db.relationship("Transaction", back_populates="compte")
     type_compte = db.relationship("TypeCompte", back_populates="comptes")
+    cartes = db.relationship("Carte", back_populates="compte")
+
+    virements_envoyes = db.relationship("Virement", foreign_keys=[Virement.compte_source_id],
+                                        back_populates="compte_source")
+    virements_recus = db.relationship("Virement", foreign_keys=[Virement.compte_destination_id],
+                                      back_populates="compte_destination")
 
     def __init__(self, client_id, type_compte, solde, date_ouverture, statut):
         self.client_id = client_id

@@ -3,9 +3,9 @@ from datetime import datetime
 import re
 
 class User(db.Model):
-    __tablename__ = 'users'
+    __tablename__ = 'user'
 
-    id = db.Column(db.Integer, primary_key=True,autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True,)
     nom = db.Column(db.String(255), nullable=False)
     prenom = db.Column(db.String(255), nullable=False)
     email = db.Column(db.Text, unique=True, nullable=False)
@@ -15,6 +15,7 @@ class User(db.Model):
     active = db.Column(db.Boolean, default=True)
 
     client = db.relationship("Client", uselist=False, back_populates="user")
+    authentification = db.relationship("Authentification", back_populates="user")
 
     def __init__(self, nom, prenom, email, username, date_creation, mise_a_jour=None, active=True):
         self.name = nom

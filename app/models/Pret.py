@@ -4,7 +4,7 @@ class Pret(db.Model):
 
     __tablename__ = "pret"
 
-    id = db.Column(db.Integer, primary_key=True,autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True)
     client_id = db.Column(db.Integer, db.ForeignKey('client.id'))
     montant_pret = db.Column(db.Numeric(15,2), nullable=False)
     taux_interet = db.Column(db.Numeric(5,2), nullable=False)

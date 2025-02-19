@@ -10,6 +10,11 @@ def create_app():
 
     db.init_app(app)
 
+    from .models import Authentification, Carte, Client,Compte,NotificationsClients,Notification,Pret,Rib,Statut,Transaction,TypeCompte,User,Virement
+
+    with app.app_context():
+        db.create_all()
+
 
     from app.routes import api
     app.register_blueprint(api, url_prefix='/PaySphereAPI')
