@@ -1,6 +1,6 @@
+from app.controllers.authentification_controller import AuthentificationController
 from app.models.User import User
 from app import db
-from datetime import datetime
 
 class UserController:
     @staticmethod
@@ -14,29 +14,40 @@ class UserController:
     @staticmethod
     def create_user(data):
         user = User(
+            id=data["id"],
             nom=data["nom"],
             prenom=data["prenom"],
             email=data["email"],
             username=data["username"],
-            date_creation=datetime.now().date()
+            active=False
         )
         db.session.add(user)
         db.session.commit()
-        return user
+
+        auth = AuthentificationController.create_auth(data["password"],user)
+
+        return user,auth
 
     @staticmethod
     def update_user(user, data):
-        for key, value in data.items():
-            setattr(user, key, value)
-        db.session.commit()
-        return user
+        try:
+            for key, value in data.items():
+                setattr(user, key, value)
+            db.session.commit()
+            return user
+        except:
+            return None
 
     @staticmethod
-    def delete_user(user):
-        db.session.delete(user)
-        db.session.commit()
+    def delete_user(user:User) -> User:
+            db.session.delete(user.authentification)
+            db.session.delete(user)
+            db.session.commit()
+            return user
+
 
     @staticmethod
     def toggle_user(user):
         user.active = not user.active
         db.session.commit()
+

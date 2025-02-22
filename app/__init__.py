@@ -15,6 +15,8 @@ def create_app():
     with app.app_context():
         db.create_all()
 
+    from app.models.Authentification import bcrypt
+    bcrypt.init_app(app)
 
     from app.routes import api
     app.register_blueprint(api, url_prefix='/PaySphereAPI')

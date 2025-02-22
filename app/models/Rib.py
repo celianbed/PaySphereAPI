@@ -1,4 +1,7 @@
 from app import db
+import random
+import string
+
 
 class Rib(db.Model):
 
@@ -14,7 +17,7 @@ class Rib(db.Model):
     adresse_banque = db.Column(db.Text, nullable=True)
 
 
-    def __init__(self, compte_id, iban, bic, titulaire_compte, banque, agence, adresse_banque):
+    def __init__(self, compte_id, iban, bic, titulaire_compte, banque, agence=None, adresse_banque=None):
         self.compte_id = compte_id
         self.iban = iban
         self.bic = bic
@@ -38,3 +41,17 @@ class Rib(db.Model):
             "agence": self.agence,
             "adresse_banque": self.adresse_banque,
         }
+
+
+    @staticmethod
+    def generate_iban(country_code="FR"):
+
+        country_code = country_code.upper()
+        control_digits = random.randint(10, 99)
+
+        bank_code = ''.join(random.choices(string.digits, k=4))
+        account_number = ''.join(random.choices(string.digits, k=11))
+
+        iban = f"{country_code}{control_digits:02d}{bank_code}{account_number}"
+        return iban, country_code
+
