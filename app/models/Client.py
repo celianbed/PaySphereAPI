@@ -1,4 +1,8 @@
+import datetime
+
 from app import db
+from app.models import User
+
 
 class Client(db.Model):
 
@@ -18,28 +22,47 @@ class Client(db.Model):
     prets = db.relationship("Pret", back_populates="client")
     user = db.relationship("User", back_populates="client")
 
-    def __init__(self, client_id, user_id, nom, prenom, email, adresse, numero_de_telephone, date_naissance):
-        self.client_id = client_id
-        self.user_id = user_id
+    def __init__(self, id:int, user:User, nom:str, prenom:str, email:str, adresse:str, numero_de_telephone:int, date_naissance:datetime):
+        self.id = id
+        self.user = user
         self.nom = nom
         self.prenom = prenom
         self.email = email
         self.adresse = adresse
         self.numero_de_telephone = numero_de_telephone
         self.date_naissance = date_naissance
+        self.comptes = []
 
     def __repr__(self):
-        return f'<Client {self.client_id}> {self.nom} {self.prenom} {self.email} {self.adresse}'
+        return f'<Client {self.id}> {self.nom} {self.prenom} {self.email} {self.adresse}'
 
-    def to_dict(self):
-        return {
-            "client_id": self.client_id,
-            "user_id": self.user_id,
+    def to_dict(self,fields=None):
+        data= {
+            "client_id": self.id,
+            "user_id": self.user.get_id(),
             "nom": self.nom,
             "prenom": self.prenom,
             "email": self.email,
             "adresse": self.adresse,
             "numero_de_telephone": self.numero_de_telephone,
             "date_naissance": self.date_naissance,
+            "comptes": [compte.to_dict() for compte in self.comptes] if self.comptes else []
         }
 
+        if not fields:
+            return data
+
+        return {key: value for key, value in data.items() if key in fields}
+
+    def get_nom(self):
+        return self.nom
+    def get_prenom(self):
+        return self.prenom
+    def get_id(self):
+        return self.id
+
+    def set_compte(self, compte):
+        self.comptes.append(compte)
+
+    def get_comptes(self):
+        return self.comptes

@@ -1,3 +1,5 @@
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.exc import SQLAlchemyError
 from app.controllers.authentification_controller import AuthentificationController
 from app.models.User import User
 from app import db
@@ -13,16 +15,20 @@ class UserController:
 
     @staticmethod
     def create_user(data):
-        user = User(
-            id=data["id"],
-            nom=data["nom"],
-            prenom=data["prenom"],
-            email=data["email"],
-            username=data["username"],
-            active=False
-        )
-        db.session.add(user)
-        db.session.commit()
+        try:
+            user = User(
+                id=data["id"],
+                nom=data["nom"],
+                prenom=data["prenom"],
+                email=data["email"],
+                username=data["username"],
+                active=False
+            )
+            db.session.add(user)
+            db.session.commit()
+        except SQLAlchemyError as e:
+            print(e)
+            return
 
         auth = AuthentificationController.create_auth(data["password"],user)
 

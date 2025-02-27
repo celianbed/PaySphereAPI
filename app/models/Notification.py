@@ -9,7 +9,7 @@ class Notification(db.Model):
     message = db.Column(db.Text, nullable=False)
     date_envoi = db.Column(db.DateTime, nullable=False)
 
-    clients = db.relationship("Client", secondary="notification_clients", back_populates="notifications")
+    clients = db.relationship("Client", secondary="notification_clients", back_populates="notifications" )
 
 
     def __init__(self, client_id, type_notification, message, date_envoi):

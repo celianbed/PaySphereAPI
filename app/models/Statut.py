@@ -9,12 +9,7 @@ class Statut(db.Model):
 
     virements = db.relationship('Virement', back_populates='statut')
     transactions = db.relationship('Transaction', back_populates='statut')
-
-
-    def __init__(self, id,nom, virements):
-        self.id = id
-        self.nom = nom
-        self.virements = virements
+    comptes = db.relationship('Compte', back_populates='statut')
 
     def __repr__(self):
         return f'<Statut {self.nom}>'
@@ -23,8 +18,17 @@ class Statut(db.Model):
         return {
             "id": self.id,
             "nom": self.nom,
-            "virements": self.virements
         }
 
+    def get_nom(self):
+        return self.nom
 
+    def get_id(self):
+        return self.id
+
+    def set_nom(self, nom):
+        self.nom = nom
+
+    def set_id(self, id):
+        self.id = id
 

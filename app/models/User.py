@@ -15,7 +15,7 @@ class User(db.Model):
     username = db.Column(db.Text, unique=True, nullable=False)
     date_creation = db.Column(db.Date, nullable=False)
     mise_a_jour= db.Column(db.DateTime, nullable=True)
-    #derniere_connexion = db.Column(db.DateTime, nullable=True)
+    derniere_connexion = db.Column(db.DateTime, nullable=True)
     active = db.Column(db.Boolean, default=True)
 
     client = db.relationship("Client", uselist=False, back_populates="user")
@@ -44,6 +44,10 @@ class User(db.Model):
             "mise_a_jour": self.mise_a_jour.isoformat() if self.mise_a_jour else None,  # Vérification si mise_a_jour existe
             "active": self.active
         }
+
+
+    def get_id(self):
+        return self.id
 
     def is_active(self):
         return self.active

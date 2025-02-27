@@ -7,7 +7,7 @@ class Rib(db.Model):
 
     __tablename__ = 'rib'
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True,autoincrement=True)
     compte_id = db.Column(db.Integer, db.ForeignKey('compte.id'))
     iban = db.Column(db.String(34), unique=True, nullable=False)
     bic = db.Column(db.String(11), nullable=False)
@@ -16,8 +16,10 @@ class Rib(db.Model):
     agence = db.Column(db.String(100), nullable=True)
     adresse_banque = db.Column(db.Text, nullable=True)
 
+    compte = db.relationship("Compte", back_populates="rib")
 
-    def __init__(self, compte_id, iban, bic, titulaire_compte, banque, agence=None, adresse_banque=None):
+
+    def __init__(self,compte_id, iban, bic, titulaire_compte, banque, agence=None, adresse_banque=None):
         self.compte_id = compte_id
         self.iban = iban
         self.bic = bic
@@ -32,7 +34,7 @@ class Rib(db.Model):
 
     def to_dict(self):
         return {
-            "id": self.id,
+            "id": self.id if self.id else None,
             "compte_id": self.compte_id,
             "iban": self.iban,
             "bic": self.bic,

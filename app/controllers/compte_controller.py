@@ -1,6 +1,8 @@
 from sqlalchemy.exc import SQLAlchemyError
-
+from app.controllers.statut_controller import StatutController
+from app.controllers.type_compte_controller import TypeCompteController
 from app.controllers.rib_controller import RibController
+from app.models.Client import Client
 from app.models.Compte import Compte
 from app.models.User import User
 from app import db
@@ -16,19 +18,19 @@ class CompteController:
         return Compte.query.get(compte_id)
 
     @staticmethod
-    def create_compte(data):
-        compte = Compte(
-            client_id=data["client_id"],
-            type_compte=data["type_compte"],
-            solde=data["solde"],
-            date_ouverture=data["date_ouverture"],
-            statut=data["statut"]
-        )
+    def create_compte(client:Client):
 
-        RibController.create_rib(data["compte_id"])
+        compte = Compte(
+            client = client,
+            type_compte=TypeCompteController.get_type_compte_by_id(1),
+            statut= StatutController.get_statut_by_id(5),
+        )
 
         db.session.add(compte)
         db.session.commit()
+
+        RibController.create_rib(compte,client)
+
         return compte
 
     @staticmethod

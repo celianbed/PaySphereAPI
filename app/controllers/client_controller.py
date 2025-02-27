@@ -1,5 +1,4 @@
 from sqlalchemy.exc import SQLAlchemyError
-
 from app.controllers.compte_controller import CompteController
 from app.models.Client import Client
 from app.models.User import User
@@ -17,7 +16,7 @@ class ClientController:
     @staticmethod
     def create_client(data):
         client = Client(
-            client_id=data["client_id"],
+            client_id=data["id"],
             user_id=data["user_id"],
             nom=data["nom"],
             prenom=data["prenom"],
@@ -29,7 +28,7 @@ class ClientController:
         db.session.add(client)
         db.session.commit()
 
-        CompteController.create_compte(client.id)
+        CompteController.create_compte(client)
 
         return client
 

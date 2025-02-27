@@ -1,6 +1,4 @@
-from app.controllers.authentification_controller import AuthentificationController
 from app.models.Rib import Rib
-from app.models.User import User
 from app import db
 
 class RibController:
@@ -13,14 +11,13 @@ class RibController:
             return Rib.query.get(user_id)
 
         @staticmethod
-        def create_rib(compte):
+        def create_rib(compte,client):
             iban,country_code = Rib.generate_iban()
-
             rib = Rib(
-                compte_id=compte.id,
+                compte_id=compte.get_id(),
                 iban= iban,
                 bic= country_code,
-                titulaire_compte=compte.client_id,
+                titulaire_compte= client.get_prenom() +" "+ client.get_nom(),
                 banque="PaySphere",
                 agence=None,
                 adresse_banque=None,

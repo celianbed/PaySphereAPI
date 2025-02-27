@@ -36,7 +36,11 @@ def handle_exceptions(func):
         try:
             return func(*args, **kwargs)
         except ValueError:
-            return jsonify({"erreur": "ID utilisateur invalide"}), 400
+            return jsonify({"erreur": "Valeur invalide fournie"}), 400
+        except KeyError as e:
+            return jsonify({"erreur": f"Donnée manquante : {str(e)}"}), 400
+        except AttributeError:
+            return jsonify({"erreur": "Objet non trouvé ou attribut inexistant"}), 404
         except Exception as e:
             return jsonify({"erreur": "Erreur interne du serveur", "message": str(e)}), 500
     return wrapper
