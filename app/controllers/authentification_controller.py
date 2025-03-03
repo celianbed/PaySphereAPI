@@ -15,7 +15,7 @@ class AuthentificationController:
     @staticmethod
     def create_auth(password,user):
         auth = Authentification(
-            user_id=user.id,
+            user=user,
             password=password,
             derniere_connexion=None
         )
@@ -24,6 +24,7 @@ class AuthentificationController:
         db.session.commit()
 
         return auth
+
 
 
 

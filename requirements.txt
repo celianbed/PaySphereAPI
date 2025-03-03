@@ -12,3 +12,7 @@ typing_extensions==4.12.2
 Werkzeug==3.1.3
 Flask-Bcrypt~=1.0.1
 pip~=25.0
+Flask-Login~=0.6.3
+attrs~=25.1.0
+alembic~=1.14.1
+Flask-JWT-Extended~=4.7.1

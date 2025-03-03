@@ -1,10 +1,13 @@
+from click import Tuple
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import SQLAlchemyError
 from app.controllers.authentification_controller import AuthentificationController
+from app.models import Authentification
 from app.models.User import User
 from app import db
 
 class UserController:
+
     @staticmethod
     def get_all_users():
         return User.query.all()
@@ -12,6 +15,10 @@ class UserController:
     @staticmethod
     def get_user_by_id(user_id):
         return User.query.get(user_id)
+
+    @staticmethod
+    def get_user_by_username( username):
+        return User.query.filter_by(username=username).first()  # Retourne None si aucun utilisateur n'est trouvé
 
     @staticmethod
     def create_user(data):
@@ -28,10 +35,9 @@ class UserController:
             db.session.commit()
         except SQLAlchemyError as e:
             print(e)
-            return
+            return False,False
 
         auth = AuthentificationController.create_auth(data["password"],user)
-
         return user,auth
 
     @staticmethod
@@ -41,8 +47,8 @@ class UserController:
                 setattr(user, key, value)
             db.session.commit()
             return user
-        except:
-            return None
+        except SQLAlchemyError as e:
+            return e
 
     @staticmethod
     def delete_user(user:User) -> User:
@@ -57,3 +63,10 @@ class UserController:
         user.active = not user.active
         db.session.commit()
 
+    @staticmethod
+    def is_exist_username(user) -> bool:
+        return db.session.query.get(user.username) is not None
+
+    @staticmethod
+    def is_exist_phone_number(user) -> bool:
+        user.client

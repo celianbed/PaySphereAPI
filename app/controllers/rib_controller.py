@@ -14,7 +14,7 @@ class RibController:
         def create_rib(compte,client):
             iban,country_code = Rib.generate_iban()
             rib = Rib(
-                compte_id=compte.get_id(),
+                compte=compte,
                 iban= iban,
                 bic= country_code,
                 titulaire_compte= client.get_prenom() +" "+ client.get_nom(),

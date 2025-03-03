@@ -28,14 +28,20 @@ def new_user():
     if not User.is_email_valid(data.get("email", "")):
         return jsonify({"erreur": "Format de mail invalide"}), 400
 
+
     user, auth = UserController.create_user(data)
-    return jsonify(user.to_dict(), auth.to_dict()), 201
+
+    if user == False | auth == False:
+        return jsonify({"erreur": "erreur"}), 401
+
+    return jsonify(user.to_dict()), 201
 
 
 @api.route('/users/<int:user_id>', methods=['GET', 'PATCH', 'DELETE'])
-@handle_exceptions
-def user_operations(user_id):
-    user = UserController.get_user_by_id(user_id)
+def user_operations():
+    data = request.get_json()
+    user = UserController.get_user_by_id(data["user_id"])
+
     if user is None:
         return jsonify({"erreur": "Utilisateur non trouvé"}), 404
 

@@ -1,5 +1,5 @@
 from flask import request, jsonify
-from .api import api
+from app.routes import api
 from ..controllers.client_controller import ClientController
 from ..utils.errors import handle_exceptions
 

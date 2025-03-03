@@ -1,6 +1,6 @@
 from sqlalchemy import DateTime
 from app import db
-from app.models import Statut
+from app.models import Statut, TypeVirement
 from ..models import Compte
 
 
@@ -24,13 +24,14 @@ class Virement(db.Model):
     statut = db.relationship('Statut',back_populates='virements')
 
 
-    def __init__(self, id, compte_source:Compte, compte_destination:Compte, montant, date_virement, statut:Statut):
+    def __init__(self, id, compte_source:Compte, compte_destination:Compte, montant, date_virement, statut:Statut,type_virement:TypeVirement):
         self.id = id
         self.compte_source = compte_source
         self.compte_destination = compte_destination
         self.montant = montant
         self.date_virement = date_virement
         self.statut = statut
+        self.type_virement = type_virement
 
     def __repr__(self):
         return f'<Virement {self.id} de {self.compte_source_id} à {self.compte_destination_id}>'
@@ -43,7 +44,7 @@ class Virement(db.Model):
             "compte_destination_id": self.compte_destination.get_id(),
             "montant": self.montant,
             "date_virement": self.date_virement,
-            "statut": self.statut if self.statut.is_active else [],
+            "statut": self.statut.to_dict() if self.statut else None,
         }
 
         if not fields:

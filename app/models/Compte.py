@@ -1,3 +1,4 @@
+import random
 from datetime import datetime
 from typing import Tuple
 from app import db
@@ -43,29 +44,33 @@ class Compte(db.Model):
         self.statut = statut
         self.virements_envoyes = []
         self.virements_recus = []
+        self.numero_compte = self.generer_num_compte()
 
     def __repr__(self):
         return f'<Compte {self.id} - Client {self.client_id} - Type {self.type_compte.nom} - Solde {self.solde} - Statut {self.statut.nom}>'
 
-    def to_dict(self,fields=None):
-         data = {
-            'id': self.id if self.id else None,
+    def to_dict(self, fields=None, exclude=None):
+        data = {
+            'id': self.id,
             'client_id': self.client.id if self.client else None,
             'type_compte': self.type_compte.to_dict() if self.type_compte else None,
             'solde': float(self.solde),
             'date_ouverture': self.date_ouverture.strftime('%Y-%m-%d'),
             'statut': self.statut.to_dict() if self.statut else None,
             "rib": self.rib.to_dict() if self.rib else None,
-            "virements_envoyes":[virements_envoyes.to_dict() for virements_envoyes in self.virements_envoyes] if self.virements_envoyes else [],
-            "virements_recu" :  [virements_recus.to_dict() for virements_recus in self.virements_recus] if self.virements_recus else [],
+            "virements_envoyes": [virements_envoyes.to_dict() for virements_envoyes in
+                                  self.virements_envoyes] if self.virements_envoyes else [],
+            "virements_recu": [virements_recus.to_dict() for virements_recus in
+                               self.virements_recus] if self.virements_recus else [],
         }
 
-         if not fields:
-             return data
+        if fields:
+            data = {key: value for key, value in data.items() if key in fields}
 
-             # Sinon, retournez seulement les champs spécifiés
-         return {key: value for key, value in data.items() if key in fields}
+        if exclude:
+            data = {key: value for key, value in data.items() if key not in exclude}
 
+        return data
 
     def get_id(self) ->int:
         return self.id
@@ -104,7 +109,7 @@ class Compte(db.Model):
         :param montant: Montant du virement à vérifier.
         :return: Tuple (bool, str). True si le virement est possible, False sinon avec un message d'explication.
         """
-        if self.statut is None or self.statut.nom.lower() != "actif":
+        if self.statut is None or self.statut.get_nom().lower() != "actif":
             return False, "Le compte n'est pas actif et ne peut pas effectuer de virement."
 
         if montant <= 0:
@@ -113,15 +118,16 @@ class Compte(db.Model):
         if self.solde < montant:
             return False, "Solde insuffisant pour effectuer ce virement."
 
-        if self.type_compte and hasattr(self.type_compte, "can_make_transfer"):
-            peut_virement, message = self.type_compte.peut_effectuer_virement(montant)
-            if not peut_virement:
-                return False, message
-
         return True, "Le virement peut être effectué."
 
     def generer_num_compte(self):
-        pass
+        num = 0
+        for i in range(0,6):
+            num += random.randint(0,9)
+
+        return num
+
+
 
 
 

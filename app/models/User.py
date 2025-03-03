@@ -2,7 +2,23 @@ from typing import Any, Tuple, Dict
 from app import db
 from datetime import datetime
 import re
+from password_validator import PasswordValidator
 
+schema = PasswordValidator()
+schema\
+    .min(12)\
+    .max(20)\
+    .has()\
+    .uppercase()\
+    .has()\
+    .lowercase()\
+    .has()\
+    .digits()\
+    .has()\
+    .no()\
+    .spaces()\
+    .has()\
+    .symbols()
 
 
 class User(db.Model):
@@ -40,9 +56,10 @@ class User(db.Model):
             "prenom": self.prenom,
             "email": self.email,
             "username": self.username,
-            "date_creation": self.date_creation.isoformat(),  # Convertit la date en chaîne ISO
-            "mise_a_jour": self.mise_a_jour.isoformat() if self.mise_a_jour else None,  # Vérification si mise_a_jour existe
-            "active": self.active
+            "date_creation": self.date_creation.isoformat(),
+            "mise_a_jour": self.mise_a_jour.isoformat() if self.mise_a_jour else None,
+            "active": self.active,
+            "authentification": self.authentification.to_dict() if self.authentification else None
         }
 
 
@@ -84,3 +101,15 @@ class User(db.Model):
     @staticmethod
     def is_email_valid(email: Dict[str,Any]) -> bool:
         return bool(re.match(r"[^@]+@[^@]+\.[^@]+", email))
+
+
+
+    def is_username_valid(self, username) -> bool:
+        return self.username == username
+
+    def get_username(self):
+        return self.username
+
+    @staticmethod
+    def is_schema_valid(password):
+        return schema.validate(password)

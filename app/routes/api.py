@@ -1,6 +1,9 @@
-from flask import Blueprint, jsonify
+from flask import jsonify, Blueprint
+from flask_jwt_extended import JWTManager
 
 api = Blueprint('PaySphereAPI', __name__)
+jwt = JWTManager()
+
 
 @api.route('/')
 def home():

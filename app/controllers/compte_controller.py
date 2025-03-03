@@ -23,7 +23,7 @@ class CompteController:
         compte = Compte(
             client = client,
             type_compte=TypeCompteController.get_type_compte_by_id(1),
-            statut= StatutController.get_statut_by_id(5),
+            statut= StatutController.get_statut_by_id(3),
         )
 
         db.session.add(compte)
