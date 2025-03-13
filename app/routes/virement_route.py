@@ -28,4 +28,8 @@ def create_virement():
         return jsonify({"success": virement_eff, "message": message}), 400
 
 
+@api.route('/virement', methods=['GET'])
+def get_virement():
 
+    virements = VirementController.get_all_virements()
+    return jsonify([v.to_dict() for v in virements]), 200

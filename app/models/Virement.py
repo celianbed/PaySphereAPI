@@ -40,11 +40,12 @@ class Virement(db.Model):
     def to_dict(self,fields=None):
         data= {
             "id": self.id,
-            "compte_source_id": self.compte_source.get_id(),
-            "compte_destination_id": self.compte_destination.get_id(),
+            "compte_source_nom": self.compte_source.client.get_identity(),
+            "compte_destination_nom": self.compte_destination.client.get_identity(),
             "montant": self.montant,
             "date_virement": self.date_virement,
-            "statut": self.statut.to_dict() if self.statut else None,
+            "statut_nom": self.statut.get_nom() if self.statut else None,
+            "type_virement_nom": self.type_virement.get_nom() if self.type_virement else None,
         }
 
         if not fields:

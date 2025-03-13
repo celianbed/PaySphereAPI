@@ -21,6 +21,9 @@ class UserController:
         return User.query.filter_by(username=username).first()  # Retourne None si aucun utilisateur n'est trouvé
 
     @staticmethod
+    def get_user_by_client_id(client_id):
+        return User.client.query.filter_by(id=client_id).first()
+    @staticmethod
     def create_user(data):
         try:
             user = User(

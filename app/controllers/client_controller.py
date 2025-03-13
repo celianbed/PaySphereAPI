@@ -14,6 +14,7 @@ class ClientController:
     def get_client_by_id(client_id):
         return Client.query.get(client_id)
 
+
     @staticmethod
     def create_client(data):
 
@@ -21,6 +22,7 @@ class ClientController:
         client = Client(
             id=data["id"],
             user=user,
+            num_client=data["num_client"],
             nom=data["nom"],
             prenom=data["prenom"],
             email=data["email"],
@@ -55,3 +57,6 @@ class ClientController:
             db.session.commit()
             return client
 
+    @staticmethod
+    def get_client_by_numero(numero_client):
+        return Client.query.filter_by(num_client=numero_client).first()

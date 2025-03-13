@@ -49,9 +49,10 @@ class User(db.Model):
     def __repr__(self):
         return f"<User id={self.id} nom={self.nom} prenom={self.prenom} email={self.email}>"
 
-    def to_dict(self):
-        return {
+    def to_dict(self,fields=None):
+        data = {
             "id": self.id,
+            "num_client": self.client.get_num_client(),
             "nom": self.nom,
             "prenom": self.prenom,
             "email": self.email,
@@ -59,8 +60,13 @@ class User(db.Model):
             "date_creation": self.date_creation.isoformat(),
             "mise_a_jour": self.mise_a_jour.isoformat() if self.mise_a_jour else None,
             "active": self.active,
-            "authentification": self.authentification.to_dict() if self.authentification else None
+            "authentification": self.authentification.to_dict() if self.authentification else None,
         }
+
+        if not fields:
+                return data
+
+        return {key: value for key, value in data.items() if key in fields}
 
 
     def get_id(self):

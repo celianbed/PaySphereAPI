@@ -38,15 +38,23 @@ def new_user():
 
 
 @api.route('/users/<int:user_id>', methods=['GET', 'PATCH', 'DELETE'])
-def user_operations():
-    data = request.get_json()
-    user = UserController.get_user_by_id(data["user_id"])
+def user_operations(user_id):
+    user = UserController.get_user_by_id(user_id)
+
+    fields = request.args.get('fields')
+
+    if fields:
+        fields_list = fields.split(',')
+        fields_list =[fild.lower() for fild in fields_list]
+    else:
+        fields_list = None
+
 
     if user is None:
-        return jsonify({"erreur": "Utilisateur non trouvé"}), 404
+        return jsonify({"erreur": "Utilisateur non trouvé"}), 404,{'Content-Type': 'application/json; charset=utf-8'}
 
     if request.method == 'GET':
-        return jsonify(user.to_dict()), 200
+        return jsonify(user.to_dict(fields=fields_list)), 200
 
     if request.method == 'PATCH':
         data = request.get_json()
@@ -58,6 +66,5 @@ def user_operations():
     if request.method == 'DELETE':
         if UserController.delete_user(user):
             return jsonify({"message": "Utilisateur bien supprimé"}), 200
-
 
 

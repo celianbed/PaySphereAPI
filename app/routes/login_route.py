@@ -1,7 +1,12 @@
 import uuid
+from dataclasses import field
+
 from flask import request, jsonify
 from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity,get_jwt
+
+from app.controllers.client_controller import ClientController
 from app.controllers.user_controller import UserController
+from app.models.Client import Client
 from app.models.User import User
 from app.routes import api,jwt
 from app.utils.errors import handle_exceptions
@@ -25,10 +30,12 @@ def register():
 @api.route('/login', methods=['POST'])
 def login():
     data = request.json
-    if not data or 'username' not in data or 'password' not in data:
+    if not data or 'num' not in data or 'password' not in data:
         return jsonify({"error": "Données invalides"}), 400
 
-    user = UserController.get_user_by_username(data['username'])
+    client = ClientController.get_client_by_numero(data['num'])
+    user = client.user
+
     if user and user.authentification.is_password_valid(data.get('password')):
         access_jti = str(uuid.uuid4())
         refresh_jti = str(uuid.uuid4())
@@ -38,7 +45,7 @@ def login():
 
         return jsonify(access_token=access_token, refresh_token=refresh_token), 200
 
-    return jsonify({"error": "Identifiants invalides"}), 401
+    return jsonify({"erreur": "Identifiants invalides"}), 401
 
 @api.route('/logout', methods=['POST'])
 @jwt_required()

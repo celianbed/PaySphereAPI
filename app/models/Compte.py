@@ -51,18 +51,19 @@ class Compte(db.Model):
 
     def to_dict(self, fields=None, exclude=None):
         data = {
-            'id': self.id,
-            'client_id': self.client.id if self.client else None,
-            'type_compte': self.type_compte.to_dict() if self.type_compte else None,
-            'solde': float(self.solde),
-            'date_ouverture': self.date_ouverture.strftime('%Y-%m-%d'),
-            'statut': self.statut.to_dict() if self.statut else None,
-            "rib": self.rib.to_dict() if self.rib else None,
-            "virements_envoyes": [virements_envoyes.to_dict() for virements_envoyes in
-                                  self.virements_envoyes] if self.virements_envoyes else [],
-            "virements_recu": [virements_recus.to_dict() for virements_recus in
-                               self.virements_recus] if self.virements_recus else [],
-        }
+                'id': self.id,
+                'client_id': self.client.id if self.client else None,
+                'type_compte_nom': self.type_compte.get_nom() if self.type_compte else None,
+                'solde': float(self.solde),
+                'date_ouverture': self.date_ouverture.strftime('%Y-%m-%d'),
+                'statut_nom': self.statut.get_nom() if self.statut else None,
+                "rib": self.rib.to_dict() if self.rib else [],
+                "virements_envoye": [virements_envoyes.to_dict() for virements_envoyes in
+                                      self.virements_envoyes] if self.virements_envoyes else [],
+                "virements_recu": [virements_recus.to_dict() for virements_recus in
+                                   self.virements_recus] if self.virements_recus else [],
+                "numero_compte": self.numero_compte,
+            }
 
         if fields:
             data = {key: value for key, value in data.items() if key in fields}
@@ -120,7 +121,8 @@ class Compte(db.Model):
 
         return True, "Le virement peut être effectué."
 
-    def generer_num_compte(self):
+    @staticmethod
+    def generer_num_compte():
         num = 0
         for i in range(0,6):
             num += random.randint(0,9)

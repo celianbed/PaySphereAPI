@@ -59,7 +59,8 @@ class VirementController :
         return True, message, virement
 
 
-
-
+    @staticmethod
+    def get_all_virements():
+        return Virement.query.all()
 
 

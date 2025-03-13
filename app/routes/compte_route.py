@@ -21,7 +21,7 @@ def create_compte(data):
 
 
 @api.route('/comptes/<int:compte_id>', methods=['GET'])
-@jwt_required
+@jwt_required()
 def get_compte(compte_id):
     fields = request.args.get('fields')
     exclude = request.args.get('exclude')
