@@ -64,3 +64,20 @@ def logout_refresh():
 @jwt.token_in_blocklist_loader
 def check_if_token_is_blacklisted(jwt_header, jwt_data):
     return jwt_data["jti"] in blacklisted_tokens
+
+
+@api.route('/verifier_code', methods=['POST'])
+def verifier_code():
+    data = request.json
+    if not data or 'num' not in data or 'password' not in data:
+        return jsonify({"error": "Données invalides"}), 400
+
+    client = ClientController.get_client_by_numero(data['num'])
+    if not client or not client.user:
+        return jsonify({"success": False}), 404
+
+    user = client.user
+    if user.authentification.is_password_valid(data.get('password')):
+        return jsonify({"success": True}), 200
+
+    return jsonify({"success": False}), 401

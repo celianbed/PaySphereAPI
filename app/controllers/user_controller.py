@@ -1,8 +1,6 @@
-from click import Tuple
-from flask_sqlalchemy import SQLAlchemy
+from app.routes import bcrypt
 from sqlalchemy.exc import SQLAlchemyError
 from app.controllers.authentification_controller import AuthentificationController
-from app.models import Authentification
 from app.models.User import User
 from app import db
 
@@ -72,4 +70,25 @@ class UserController:
 
     @staticmethod
     def is_exist_phone_number(user) -> bool:
-        user.client
+        pass
+
+    @staticmethod
+    def changer_mot_de_passe(user_id, ancien_password, nouveau_password):
+        auth = AuthentificationController.get_auth_by_user_id(user_id)
+
+        if not auth:
+            return {"error": "Utilisateur introuvable"}, 404
+
+        if not bcrypt.check_password_hash(auth.password_hash, ancien_password):
+            return {"error": "Ancien mot de passe incorrect"}, 401
+
+        try:
+
+            print(nouveau_password)
+            auth.password_hash = bcrypt.generate_password_hash(nouveau_password).decode("utf-8")
+
+            db.session.commit()
+            return {"message": "Mot de passe mis à jour avec succès"}, 200
+        except Exception as e:
+            db.session.rollback()
+            return {"error": f"Erreur serveur : {str(e)}"}, 500

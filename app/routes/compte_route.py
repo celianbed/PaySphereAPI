@@ -1,9 +1,11 @@
 from flask import jsonify,request
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from sqlalchemy.exc import SQLAlchemyError
 
 from .api import api
 from app.controllers.compte_controller import CompteController
-from app.utils.errors import handle_exceptions
+from ..models import Compte, Client
+from ..utils.errors import handle_exceptions
 
 
 @api.route('/comptes', methods=['GET'])
@@ -23,20 +25,38 @@ def create_compte(data):
 @api.route('/comptes/<int:compte_id>', methods=['GET'])
 @jwt_required()
 def get_compte(compte_id):
+    user_id = int(get_jwt_identity())
+
+
+    # Récupération du compte
+    compte:Compte = CompteController.get_compte_by_id(compte_id)
+
+    if not compte:
+        return jsonify({"error": "Compte introuvable"}), 404
+
+    # Vérification que ce compte appartient bien à l'utilisateur connecté
+    if compte.client.user.get_id() != user_id:
+        return jsonify({"error": "Accès interdit"}), 403
+
+    # Gestion des paramètres fields / exclude
     fields = request.args.get('fields')
     exclude = request.args.get('exclude')
 
     if fields:
-        fields_list = fields.split(',')
-        fields_list =[fild.lower() for fild in fields_list]
+        fields_list = [f.strip().lower() for f in fields.split(',')]
     else:
         fields_list = None
 
     if exclude:
-        exclude_list = exclude.split(',')
-        exclude_list = [exclude.lower() for exclude in exclude_list]
+        exclude_list = [e.strip().lower() for e in exclude.split(',')]
     else:
         exclude_list = None
 
-    compte = CompteController.get_compte_by_id(compte_id)
-    return jsonify(compte.to_dict(fields=fields_list,exclude=exclude_list)), 200
+    return jsonify(compte.to_dict(fields=fields_list, exclude=exclude_list)), 200
+
+
+
+
+
+
+

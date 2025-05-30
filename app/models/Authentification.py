@@ -1,9 +1,8 @@
 import datetime
 from app import db
-from flask_bcrypt import Bcrypt
 from app.models import User
+from app.routes import bcrypt
 
-bcrypt = Bcrypt()
 
 class Authentification(db.Model):
 

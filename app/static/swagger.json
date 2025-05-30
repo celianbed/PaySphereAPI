@@ -1,0 +1,1281 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "PaySphere API",
+    "description": "Documentation de l'API PaySphereAPI",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "/PaySphereAPI"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Accueil",
+      "description": "Routes d'accueil et redirection"
+    },
+    {
+      "name": "Cartes",
+      "description": "Gestion des cartes bancaires"
+    },
+    {
+      "name": "Clients",
+      "description": "Création et gestion des clients"
+    },
+    {
+      "name": "Comptes",
+      "description": "Gestion des comptes bancaires"
+    },
+    {
+      "name": "Utilisateurs",
+      "description": "Gestion des utilisateurs"
+    },
+    {
+      "name": "Authentification",
+      "description": "Connexion et sécurité JWT"
+    },
+    {
+      "name": "Virements",
+      "description": "Création et vérification des virements"
+    },
+    {
+      "name": "Notifications",
+      "description": "Suivi des notifications client"
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "tags": [
+          "Accueil"
+        ],
+        "summary": "Page d'accueil",
+        "description": "Affiche un message de bienvenue et un lien vers la documentation.",
+        "responses": {
+          "200": {
+            "description": "Page d'accueil affichée",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/documentation": {
+      "get": {
+        "tags": [
+          "Accueil"
+        ],
+        "summary": "Redirection vers Swagger UI",
+        "description": "Redirige automatiquement vers l'interface Swagger UI.",
+        "responses": {
+          "302": {
+            "description": "Redirection vers /swagger",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/cartes/{carte_id}/opposee": {
+      "post": {
+        "tags": [
+          "Cartes"
+        ],
+        "summary": "Opposer une carte",
+        "description": "Désactive une carte existante.",
+        "parameters": [
+          {
+            "name": "carte_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Carte désactivée avec succés",
+            "content": {}
+          },
+          "404": {
+            "description": "Carte introuvable",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/cartes/{carte_id}/plafond": {
+      "get": {
+        "tags": [
+          "Cartes"
+        ],
+        "summary": "Voir le plafond",
+        "description": "Retourne l'utilisation actuelle du plafond de la carte.",
+        "parameters": [
+          {
+            "name": "carte_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Plafond récupérer",
+            "content": {}
+          },
+          "500": {
+            "description": "Erreur interne",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Cartes"
+        ],
+        "summary": "Modifier le plafond",
+        "description": "Met à jour le plafond de paiement de la carte.",
+        "parameters": [
+          {
+            "name": "carte_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "required": [
+                  "active"
+                ],
+                "type": "object",
+                "properties": {
+                  "active": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Plafond mis à jour",
+            "content": {}
+          },
+          "400": {
+            "description": "Plafond invalide",
+            "content": {}
+          },
+          "404": {
+            "description": "Carte introuvable",
+            "content": {}
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/cartes/{carte_id}/paiement-en-ligne": {
+      "patch": {
+        "tags": [
+          "Cartes"
+        ],
+        "summary": "Activer/Désactiver le paiement en ligne",
+        "description": "Met à jour l'option de paiement en ligne.",
+        "parameters": [
+          {
+            "name": "carte_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "required": [
+                  "active"
+                ],
+                "type": "object",
+                "properties": {
+                  "active": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Option mise à jour",
+            "content": {}
+          },
+          "400": {
+            "description": "Champ manquant",
+            "content": {}
+          },
+          "404": {
+            "description": "Carte introuvable",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/cartes/{carte_id}/paiement-sans-contact": {
+      "patch": {
+        "tags": [
+          "Cartes"
+        ],
+        "summary": "Activer/Désactiver le sans contact",
+        "description": "Met à jour l'option de paiement sans contact.",
+        "parameters": [
+          {
+            "name": "carte_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "required": [
+                  "active"
+                ],
+                "type": "object",
+                "properties": {
+                  "active": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Option mise à jour",
+            "content": {}
+          },
+          "400": {
+            "description": "Champ manquant",
+            "content": {}
+          },
+          "404": {
+            "description": "Carte introuvable",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/clients": {
+      "post": {
+        "tags": [
+          "Clients"
+        ],
+        "summary": "Créer un client",
+        "description": "Créer un nouveau client à partir des données JSON.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Client créer",
+            "content": {}
+          },
+          "400": {
+            "description": "Données manquantes ou invalides",
+            "content": {}
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/clients/{client_id}": {
+      "get": {
+        "tags": [
+          "Clients"
+        ],
+        "summary": "Récupérer un client par ID",
+        "description": "Retourne les informations du client selon l'ID.",
+        "parameters": [
+          {
+            "name": "client_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client trouvé",
+            "content": {}
+          },
+          "404": {
+            "description": "Client introuvable",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Clients"
+        ],
+        "summary": "Supprimer un client",
+        "description": "Supprime un client de la base de données.",
+        "parameters": [
+          {
+            "name": "client_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client supprimé",
+            "content": {}
+          },
+          "404": {
+            "description": "Client introuvable",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Clients"
+        ],
+        "summary": "Modifier un client",
+        "description": "Modifie les informations d'un client existant.",
+        "parameters": [
+          {
+            "name": "client_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Client mis à jour",
+            "content": {}
+          },
+          "400": {
+            "description": "Données JSON manquantes",
+            "content": {}
+          },
+          "404": {
+            "description": "Client introuvable",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/clients/numero/{numero_client}": {
+      "get": {
+        "tags": [
+          "Clients"
+        ],
+        "summary": "Récupérer un client par numéro",
+        "description": "Retourne les informations du client via son numéro client.",
+        "parameters": [
+          {
+            "name": "numero_client",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client trouvé",
+            "content": {}
+          },
+          "404": {
+            "description": "Client introuvable",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/clients/beneficiaires": {
+      "post": {
+        "tags": [
+          "Clients"
+        ],
+        "summary": "Ajouter un bénéficiaire",
+        "description": "Ajoute un bénéficiaire pour le client connecté.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "iban",
+                  "nom"
+                ],
+                "type": "object",
+                "properties": {
+                  "iban": {
+                    "type": "string"
+                  },
+                  "nom": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Bénéficiaire",
+            "content": {}
+          },
+          "400": {
+            "description": "Données manquantes ou IBAN existant",
+            "content": {}
+          },
+          "404": {
+            "description": "Client introuvable",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/clients/beneficiaires/{beneficiaire_id}": {
+      "delete": {
+        "tags": [
+          "Clients"
+        ],
+        "summary": "Supprimer un bénéficiaire",
+        "description": "Supprime un bénéficiaire d'un client.",
+        "parameters": [
+          {
+            "name": "beneficiaire_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bénéficiaire supprimé",
+            "content": {}
+          },
+          "404": {
+            "description": "Bénéficiaire introuvable",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/comptes": {
+      "get": {
+        "tags": [
+          "Comptes"
+        ],
+        "summary": "Liste des comptes",
+        "description": "Récupère tous les comptes existants (accés public).",
+        "responses": {
+          "200": {
+            "description": "Liste de comptes retourne",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {}
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Comptes"
+        ],
+        "summary": "Créer un compte",
+        "description": "Crée un nouveau compte à partir des données JSON.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Compte créer avec succés",
+            "content": {}
+          },
+          "400": {
+            "description": "Requête invalide",
+            "content": {}
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/comptes/{compte_id}": {
+      "get": {
+        "tags": [
+          "Comptes"
+        ],
+        "summary": "Obtenir un compte par ID",
+        "description": "Retourne les détails d'un compte si l'utilisateur y est autorisé.",
+        "parameters": [
+          {
+            "name": "compte_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Champs à inclure (séparés par des virgules)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "exclude",
+            "in": "query",
+            "description": "Champs à exclure (séparés par des virgules)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Compte trouvée",
+            "content": {}
+          },
+          "403": {
+            "description": "Accéss interdit",
+            "content": {}
+          },
+          "404": {
+            "description": "Compte introuvable",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/register": {
+      "post": {
+        "tags": [
+          "Utilisateurs"
+        ],
+        "summary": "Inscription",
+        "description": "Permet à un utilisateur de s'inscrire avec un nom d'utilisateur et un mot de passe.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "password",
+                  "username"
+                ],
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Utilisateur enregistré",
+            "content": {}
+          },
+          "400": {
+            "description": "Nom d'utilisateur déjà pris ou mot de passe invalide",
+            "content": {}
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/login": {
+      "post": {
+        "tags": [
+          "Authentification"
+        ],
+        "summary": "Connexion",
+        "description": "Authentifie un client via son numéro et son mot de passe.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "num",
+                  "password"
+                ],
+                "type": "object",
+                "properties": {
+                  "num": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Connexion réussie, retourne les tokens",
+            "content": {}
+          },
+          "401": {
+            "description": "Identifiants invalides",
+            "content": {}
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/logout": {
+      "post": {
+        "tags": [
+          "Authentification"
+        ],
+        "summary": "Déconnexion",
+        "description": "Révoque le token d'accès en cours.",
+        "responses": {
+          "200": {
+            "description": "Déconnexion réussie",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/logout_refresh": {
+      "post": {
+        "tags": [
+          "Authentification"
+        ],
+        "summary": "Déconnexion Refresh Token",
+        "description": "Révoque le refresh token en cours.",
+        "responses": {
+          "200": {
+            "description": "Refresh token révoque",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/verifier_code": {
+      "post": {
+        "tags": [
+          "Authentification"
+        ],
+        "summary": "Vérifier le code confidentiel",
+        "description": "Vérifie si le mot de passe d'un utilisateur est correct.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "num",
+                  "password"
+                ],
+                "type": "object",
+                "properties": {
+                  "num": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Mot de passe correct",
+            "content": {}
+          },
+          "401": {
+            "description": "Mot de passe incorrect",
+            "content": {}
+          },
+          "404": {
+            "description": "Client introuvable",
+            "content": {}
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/notifications": {
+      "get": {
+        "tags": [
+          "Notifications"
+        ],
+        "summary": "Lister les notifications",
+        "description": "Récupère toutes les notifications associées au client connecté.",
+        "responses": {
+          "200": {
+            "description": "Liste des notifications",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {}
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/notifications/{notif_id}/lu": {
+      "post": {
+        "tags": [
+          "Notifications"
+        ],
+        "summary": "Marquer une notification comme lue",
+        "description": "Supprime la notification avec l'ID données, la considérant comme lue.",
+        "parameters": [
+          {
+            "name": "notif_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Notification marquée comme vue",
+            "content": {}
+          },
+          "404": {
+            "description": "Notification non trouvée",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users": {
+      "get": {
+        "tags": [
+          "Utilisateurs"
+        ],
+        "summary": "Liste tous les utilisateurs",
+        "description": "Retourne la liste de tous les utilisateurs.",
+        "responses": {
+          "200": {
+            "description": "Liste des utilisateurs",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {}
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Utilisateurs"
+        ],
+        "summary": "Créer un utilisateur",
+        "description": "Crée un nouvel utilisateur avec email, mot de passe, etc.",
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Utilisateur crée",
+            "content": {}
+          },
+          "400": {
+            "description": "Données invalides",
+            "content": {}
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/users/{user_id}": {
+      "get": {
+        "tags": [
+          "Utilisateurs"
+        ],
+        "summary": "Obtenir un utilisateur",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Détails de l'utilisateur",
+            "content": {}
+          },
+          "404": {
+            "description": "Utilisateur non trouvée",
+            "content": {}
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Utilisateurs"
+        ],
+        "summary": "Supprimer un utilisateur",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Utilisateur supprimé",
+            "content": {}
+          },
+          "404": {
+            "description": "Utilisateur non trouvé",
+            "content": {}
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Utilisateurs"
+        ],
+        "summary": "Modifier un utilisateur",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Utilisateur mis à jour",
+            "content": {}
+          },
+          "400": {
+            "description": "Données invalides",
+            "content": {}
+          },
+          "404": {
+            "description": "Utilisateur non trouvée",
+            "content": {}
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/users/{user_id}/change-password": {
+      "patch": {
+        "tags": [
+          "Utilisateurs"
+        ],
+        "summary": "Changer le mot de passe",
+        "description": "Permet à un utilisateur de modifier son mot de passe.",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "ancien_password": {
+                    "type": "string"
+                  },
+                  "nouveau_password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Mot de passe changée avec succés",
+            "content": {}
+          },
+          "400": {
+            "description": "Requête invalide",
+            "content": {}
+          },
+          "403": {
+            "description": "Accès interdit",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/virement": {
+      "get": {
+        "tags": [
+          "Virements"
+        ],
+        "summary": "Liste des virements",
+        "description": "Retourne tous les virements enregistrés.",
+        "responses": {
+          "200": {
+            "description": "Liste des virements",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {}
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Virements"
+        ],
+        "summary": "Créer un virement",
+        "description": "Crée un virement entre deux comptes.",
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "required": [
+                  "from_account",
+                  "montant",
+                  "to_account_iban"
+                ],
+                "type": "object",
+                "properties": {
+                  "from_account": {
+                    "type": "integer"
+                  },
+                  "to_account_iban": {
+                    "type": "string"
+                  },
+                  "montant": {
+                    "type": "number",
+                    "format": "float"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Virement effectué avec succès",
+            "content": {}
+          },
+          "400": {
+            "description": "Erreur de validation",
+            "content": {}
+          },
+          "403": {
+            "description": "Accès non autorisé",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/virements/verifie-beneficiaire": {
+      "post": {
+        "tags": [
+          "Virements"
+        ],
+        "summary": "Vérifier un bénéficiaire",
+        "description": "Vérifie si un IBAN correspond à un bénéficiaire existant.",
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "required": [
+                  "to_account_iban"
+                ],
+                "type": "object",
+                "properties": {
+                  "to_account_iban": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Bénéficiaire trouvées",
+            "content": {}
+          },
+          "400": {
+            "description": "IBAN manquant",
+            "content": {}
+          },
+          "404": {
+            "description": "Bénéficiaire introuvable",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "x-codegen-request-body-name": "body"
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "apiKey",
+        "description": "Utilise un token JWT sous la forme: Bearer <token>",
+        "name": "Authorization",
+        "in": "header"
+      }
+    }
+  },
+  "x-original-swagger-version": "2.0"
+}

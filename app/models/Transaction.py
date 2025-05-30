@@ -9,7 +9,7 @@ class Transaction(db.Model):
     montant = db.Column(db.Numeric(15,2), nullable=False)
     statut_id= db.Column(db.Integer, db.ForeignKey('statut.id'))
     date_transaction = db.Column(db.DateTime, nullable=False)
-    type_transaction_id = db.Column(db.String(20),db.ForeignKey("type_transaction.id"), nullable=False)
+    type_transaction_id = db.Column(db.Integer(),db.ForeignKey("type_transaction.id"), nullable=False)
     description = db.Column(db.Text, nullable=False)
     compte_destinataire = db.Column(db.Integer, nullable=False)
 

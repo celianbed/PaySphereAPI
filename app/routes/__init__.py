@@ -1,7 +1,8 @@
-from .api import api,jwt
+from .api import api,jwt,mail,bcrypt
 from .user_route import *
 from .compte_route import *
 from .client_route import *
 from  .virement_route import *
 from .login_route import *
-
+from .carte_route import *
+from .notification_route import *

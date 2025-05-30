@@ -20,9 +20,11 @@ class Client(db.Model):
 
 
     comptes = db.relationship("Compte", back_populates="client")
-    notifications = db.relationship("Notification",secondary="notification_clients", back_populates="clients")
+    notifications = db.relationship("Notification",secondary="notification_clients", back_populates="client")
     prets = db.relationship("Pret", back_populates="client")
     user = db.relationship("User", back_populates="client")
+    beneficiaires = db.relationship('Beneficiaire', back_populates='client', cascade='all, delete-orphan')
+
 
     def __init__(self, id:int, user:User, num_client:int, nom:str, prenom:str, email:str, adresse:str, numero_de_telephone:int, date_naissance:datetime):
         self.id = id
@@ -52,6 +54,7 @@ class Client(db.Model):
             "date_naissance": self.date_naissance.strftime("%Y-%m-%d"),
             "num_client": self.num_client,
             "comptes": [compte.to_dict() for compte in self.comptes] if self.comptes else [],
+            "beneficiaires": [beneficiaire.to_dict() for beneficiaire in self.beneficiaires] if self.beneficiaires else [],
         }
 
         if not fields:

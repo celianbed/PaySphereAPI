@@ -8,7 +8,7 @@ class Virement(db.Model):
 
     __tablename__ = 'virement'
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True,autoincrement=True)
     compte_source_id = db.Column(db.Integer, db.ForeignKey('compte.id'))
     compte_destination_id = db.Column(db.Integer, db.ForeignKey('compte.id'))
     montant = db.Column(db.Numeric(15,2), nullable=False)
@@ -24,8 +24,7 @@ class Virement(db.Model):
     statut = db.relationship('Statut',back_populates='virements')
 
 
-    def __init__(self, id, compte_source:Compte, compte_destination:Compte, montant, date_virement, statut:Statut,type_virement:TypeVirement):
-        self.id = id
+    def __init__(self, compte_source:Compte, compte_destination:Compte, montant, date_virement, statut:Statut,type_virement:TypeVirement):
         self.compte_source = compte_source
         self.compte_destination = compte_destination
         self.montant = montant

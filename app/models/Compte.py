@@ -6,7 +6,7 @@ from app.models import Rib
 from app.models.Client import Client
 from app.models.Statut import Statut
 from app.models.TypeCompte import TypeCompte
-from app.models.Virement import Virement  # Import pour éviter référence circulaire
+from app.models.Virement import Virement
 
 
 class Compte(db.Model):
@@ -21,7 +21,6 @@ class Compte(db.Model):
     date_ouverture = db.Column(db.Date, nullable=False, default=datetime.now().date())
 
 
-    # Relations
     client = db.relationship("Client", uselist=False, back_populates="comptes")
     transactions = db.relationship("Transaction", back_populates="compte")
     type_compte = db.relationship("TypeCompte", back_populates="comptes")
@@ -45,6 +44,7 @@ class Compte(db.Model):
         self.virements_envoyes = []
         self.virements_recus = []
         self.numero_compte = self.generer_num_compte()
+        self.cartes = []
 
     def __repr__(self):
         return f'<Compte {self.id} - Client {self.client_id} - Type {self.type_compte.nom} - Solde {self.solde} - Statut {self.statut.nom}>'
@@ -58,11 +58,12 @@ class Compte(db.Model):
                 'date_ouverture': self.date_ouverture.strftime('%Y-%m-%d'),
                 'statut_nom': self.statut.get_nom() if self.statut else None,
                 "rib": self.rib.to_dict() if self.rib else [],
-                "virements_envoye": [virements_envoyes.to_dict() for virements_envoyes in
+                "virements_envoye": [virement_envoye.to_dict() for virement_envoye in
                                       self.virements_envoyes] if self.virements_envoyes else [],
-                "virements_recu": [virements_recus.to_dict() for virements_recus in
+                "virements_recu": [virement_recu.to_dict() for virement_recu in
                                    self.virements_recus] if self.virements_recus else [],
                 "numero_compte": self.numero_compte,
+                "cartes" : [carte.to_dict() for carte in self.cartes] if self.cartes else [],
             }
 
         if fields:

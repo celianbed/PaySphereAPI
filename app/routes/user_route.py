@@ -1,4 +1,5 @@
 from flask import jsonify, request
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.controllers.user_controller import UserController
 from app.models.User import User
 from app.utils.errors import handle_exceptions
@@ -68,3 +69,24 @@ def user_operations(user_id):
             return jsonify({"message": "Utilisateur bien supprimé"}), 200
 
 
+@api.route('/users/<int:user_id>/change-password', methods=['PATCH'])
+@jwt_required()
+def changer_mot_de_passe_route(user_id):
+    user_connecte_id = int(get_jwt_identity())
+
+    # Vérification que l'utilisateur modifie bien son propre mot de passe
+    if user_id != user_connecte_id:
+        return jsonify({"error": "Accès interdit"}), 403
+
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Données JSON manquantes"}), 400
+
+    ancien = data.get('ancien_password')
+    nouveau = data.get('nouveau_password')
+
+    if not ancien or not nouveau:
+        return jsonify({"error": "Les champs 'ancien_password' et 'nouveau_password' sont requis"}), 400
+
+    result, status_code = UserController.changer_mot_de_passe(user_id, ancien, nouveau)
+    return jsonify(result), status_code

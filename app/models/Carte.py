@@ -13,6 +13,10 @@ class Carte(db.Model):
     date_expiration = db.Column(db.Date, nullable=False)
     code_securite = db.Column(db.String(4), nullable=False)
     type_carte_id = db.Column(db.Integer,db.ForeignKey('type_carte.id'),nullable=False)
+    active = db.Column(db.Boolean, nullable=True,default=True)
+    plafond = db.Column(db.Integer, nullable=True,default=500)
+    paiment_sans_contact = db.Column(db.Boolean, nullable=True,default=False)
+    paiment_en_ligne = db.Column(db.Boolean, nullable=True,default=False)
 
     compte = db.relationship('Compte',back_populates='cartes')
     type_carte = db.relationship('TypeCarte',back_populates='cartes')
@@ -22,7 +26,6 @@ class Carte(db.Model):
         self.date_expiration = date_expiration
         self.code_securite = code_securite
         self.type_carte = type_carte
-        self.comptes = []
 
 
     def __repr__(self) -> str:
@@ -35,9 +38,14 @@ class Carte(db.Model):
             "numero_carte": self.numero_carte,
             "date_expiration": self.date_expiration,
             "code_securite": self.code_securite,
-            "type_carte": self.type_carte,
-            "comptes_lié":[compte.to_dict() for compte in self.comptes] if self.comptes else []
+            "type_carte": self.type_carte.to_dict(),
+            "numero_compte" : self.compte.numero_compte,
+            "active": self.active,
+            "plafond": self.plafond,
+            "paiment_sans_contact": self.paiment_sans_contact,
+            "paiment_en_ligne": self.paiment_en_ligne,
         }
+        print(self.type_carte)
 
         if not fields:
             return data
