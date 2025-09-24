@@ -31,6 +31,7 @@ def create_app():
     bcrypt.init_app(app)
     db.init_app(app)
 
+
     from .models import Authentification, Carte, Client,Compte,NotificationsClients,Notification,Pret,Rib,Statut,Transaction,TypeCompte,User,Virement,TypeCarte,TypeVirement,TypeTransaction,Beneficiaire
 
     migrate = Migrate(app, db)
@@ -40,6 +41,15 @@ def create_app():
 
 
     from app.routes import api
+
+    print("=== Vérification des fonctions différées dans le blueprint ===")
+    for rule in api.deferred_functions:
+        try:
+            fn = rule.__closure__[0].cell_contents
+            print("Route enregistrée :", getattr(fn, '__name__', str(fn)))
+        except Exception:
+            print("Route: inconnue")
+
     app.register_blueprint(api, url_prefix='/PaySphereAPI')
     app.register_blueprint(swagger_ui_blueprint, url_prefix=SWAGGER_URL)
 

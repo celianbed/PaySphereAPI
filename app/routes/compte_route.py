@@ -1,14 +1,15 @@
 from flask import jsonify,request
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from sqlalchemy.exc import SQLAlchemyError
-
-from .api import api
 from app.controllers.compte_controller import CompteController
-from ..models import Compte, Client
+from ..models import Compte
 from ..utils.errors import handle_exceptions
+from app.routes import api
+
 
 
 @api.route('/comptes', methods=['GET'])
+@jwt_required()
+@handle_exceptions
 def get_all_compte():
     comptes = CompteController.get_all_comptes()
     return jsonify([compte.to_dict() for compte in comptes]), 200
@@ -16,6 +17,7 @@ def get_all_compte():
 
 
 @api.route('/comptes', methods=['POST'])
+@jwt_required()
 @handle_exceptions
 def create_compte(data):
     compte = CompteController.create_compte(data)
@@ -24,9 +26,9 @@ def create_compte(data):
 
 @api.route('/comptes/<int:compte_id>', methods=['GET'])
 @jwt_required()
+@handle_exceptions
 def get_compte(compte_id):
     user_id = int(get_jwt_identity())
-
 
     # Récupération du compte
     compte:Compte = CompteController.get_compte_by_id(compte_id)

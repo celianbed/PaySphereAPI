@@ -13,10 +13,10 @@ class VirementController :
     @staticmethod
     def create_virement(data):
         """
-        Creates a bank transfer (virement) between two accounts if possible.
+        Crée un virement bancaire entre deux comptes si possible.
 
-        :param data: Dictionary containing virement details.
-        :return: Virement object if successful, or an error message.
+        :param data: Dictionnaire contenant les détails du virement.
+        :return: Objet Virement si réussi, ou un message d’erreur.
         """
         # Récupération des comptes
 

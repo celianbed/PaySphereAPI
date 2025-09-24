@@ -3,7 +3,6 @@ from flask_jwt_extended import jwt_required
 from .api import api
 from .. import db
 from ..controllers.carte_controller import CarteController
-
 from ..models.Carte import Carte
 
 
@@ -46,8 +45,6 @@ def set_plafond(carte_id):
 
     try:
         nouveau_plafond = float(data['plafond_paiement'])
-
-        print(nouveau_plafond)
 
         if nouveau_plafond < 0:
             return jsonify({'error': 'Le plafond doit être positif'}), 400

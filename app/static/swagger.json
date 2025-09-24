@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "/PaySphereAPI"
+      "url": "https://api.celianbedminster.fr/PaySphereAPI"
     }
   ],
   "tags": [
@@ -46,21 +46,6 @@
   ],
   "paths": {
     "/": {
-      "get": {
-        "tags": [
-          "Accueil"
-        ],
-        "summary": "Page d'accueil",
-        "description": "Affiche un message de bienvenue et un lien vers la documentation.",
-        "responses": {
-          "200": {
-            "description": "Page d'accueil affichée",
-            "content": {}
-          }
-        }
-      }
-    },
-    "/documentation": {
       "get": {
         "tags": [
           "Accueil"
