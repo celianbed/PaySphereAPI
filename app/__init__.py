@@ -15,9 +15,9 @@ db = SQLAlchemy()
 limiter = Limiter(key_func=get_remote_address, default_limits=["200 per hour"])
 
 
-def create_app():
+def create_app(config_class=None):
     app = Flask(__name__)
-    app.config.from_object(Config)
+    app.config.from_object(config_class or Config)
 
     app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
     app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=7)
