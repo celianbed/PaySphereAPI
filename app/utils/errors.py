@@ -1,10 +1,9 @@
-﻿from functools import wraps
+from functools import wraps
 from flask import jsonify
 
 
 class APIError(Exception):
-    """Classe de base pour les erreurs API personnalisées"""
-    status_code = 400  # Par défaut, une erreur 400 (Bad Request)
+    status_code = 400
 
     def __init__(self, message, status_code=None):
         super().__init__()
@@ -15,32 +14,39 @@ class APIError(Exception):
     def to_dict(self):
         return {"error": self.message}
 
-# Erreur spécifique (ex: Ressource non trouvée)
+
 class NotFoundError(APIError):
     def __init__(self, message="Ressource non trouvée"):
         super().__init__(message, 404)
 
-# Erreur spécifique (ex: Accès non autorisé)
+
 class UnauthorizedError(APIError):
     def __init__(self, message="Accès interdit"):
         super().__init__(message, 403)
+
 
 class ServerError(APIError):
     def __init__(self, message="Erreur serveur"):
         super().__init__(message, 500)
 
+
 def handle_exceptions(func):
-    """Décorateur pour gérer les erreurs dans les routes Flask"""
     @wraps(func)
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
+        except APIError as e:
+            return jsonify(e.to_dict()), e.status_code
         except ValueError:
             return jsonify({"erreur": "Valeur invalide fournie"}), 400
         except KeyError as e:
             return jsonify({"erreur": f"Donnée manquante : {str(e)}"}), 400
-        except AttributeError:
-            return jsonify({"erreur": "Objet non trouvé ou attribut inexistant"}), 404
+        except AttributeError as e:
+            print(f"AttributeError in {func.__name__}: {e}")
+            return jsonify({"erreur": "Ressource non trouvée"}), 404
         except Exception as e:
-            return jsonify({"erreur": "Erreur interne du serveur", "message": str(e)}), 500
+            print(f"Exception in {func.__name__}: {type(e).__name__}: {e}")
+            import traceback
+            traceback.print_exc()
+            return jsonify({"erreur": "Erreur interne du serveur"}), 500
     return wrapper
