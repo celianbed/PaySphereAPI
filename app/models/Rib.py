@@ -2,8 +2,6 @@ from app import db
 import random
 import string
 
-from app.models.Compte import Compte
-
 
 class Rib(db.Model):
 
@@ -21,7 +19,7 @@ class Rib(db.Model):
     compte = db.relationship("Compte", back_populates="rib")
 
 
-    def __init__(self,compte:Compte, iban, bic, titulaire_compte, banque, agence=None, adresse_banque=None):
+    def __init__(self, compte, iban, bic, titulaire_compte, banque, agence=None, adresse_banque=None):
         self.compte = compte
         self.iban = iban
         self.bic = bic

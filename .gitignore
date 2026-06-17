@@ -1,0 +1,38 @@
+# Environment
+.env
+.flaskenv
+venv/
+.venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Flask
+instance/
+flask.log
+
+# Migrations
+migrations/versions/*.pyc
+
+# Secrets
+*.pem
+*.key

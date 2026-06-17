@@ -34,9 +34,12 @@ def login():
         return jsonify({"error": "Données invalides"}), 400
 
     client = ClientController.get_client_by_numero(data['num'])
+    if not client or not client.user:
+        return jsonify({"erreur": "Identifiants invalides"}), 401
+
     user = client.user
 
-    if user and user.authentification.is_password_valid(data.get('password')):
+    if user.authentification and user.authentification.is_password_valid(data.get('password')):
         access_jti = str(uuid.uuid4())
         refresh_jti = str(uuid.uuid4())
 

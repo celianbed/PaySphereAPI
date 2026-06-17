@@ -1,7 +1,5 @@
 import datetime
-
 from app import db
-from app.models import User
 
 
 class Client(db.Model):
@@ -26,7 +24,7 @@ class Client(db.Model):
     beneficiaires = db.relationship('Beneficiaire', back_populates='client', cascade='all, delete-orphan')
 
 
-    def __init__(self, id:int, user:User, num_client:int, nom:str, prenom:str, email:str, adresse:str, numero_de_telephone:int, date_naissance:datetime):
+    def __init__(self, id, user, num_client, nom, prenom, email, adresse, numero_de_telephone, date_naissance):
         self.id = id
         self.user = user
         self.nom = nom

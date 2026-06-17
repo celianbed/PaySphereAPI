@@ -1,9 +1,15 @@
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 class Config:
-    SQLALCHEMY_DATABASE_URI = 'postgresql://neondb_owner:npg_t1Hcgsq4XFSw@ep-lucky-fog-adr97bc8-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require' #postgresql://admin:adminpass@192.168.1.20:5432/PaySphereDB
+    _db_url = os.environ.get('DATABASE_URL', '')
+    SQLALCHEMY_DATABASE_URI = _db_url.replace('postgresql://', 'postgresql+psycopg://', 1) if _db_url else None
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SECRET_KEY = os.getenv('SECRET_KEY', 'my_secret_key')
+    SECRET_KEY = os.environ.get('SECRET_KEY', os.urandom(32).hex())
+    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', os.urandom(32).hex())
 
     JWT_BLACKLIST_ENABLED = True
     JWT_BLACKLIST_TOKEN_CHECKS = ["access", "refresh"]

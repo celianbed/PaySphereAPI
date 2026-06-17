@@ -1,5 +1,4 @@
 from app import db
-from app.models.Client import Client
 
 
 class Beneficiaire(db.Model):
@@ -14,7 +13,7 @@ class Beneficiaire(db.Model):
     client = db.relationship('Client', back_populates='beneficiaires')
 
 
-    def __init__(self, nom:str, iban:str, client:Client):
+    def __init__(self, nom, iban, client):
         self.nom = nom
         self.iban = iban
         self.client = client

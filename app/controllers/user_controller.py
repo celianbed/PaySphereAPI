@@ -20,7 +20,9 @@ class UserController:
 
     @staticmethod
     def get_user_by_client_id(client_id):
-        return User.client.query.filter_by(id=client_id).first()
+        from app.models.Client import Client
+        client = Client.query.get(client_id)
+        return client.user if client else None
     @staticmethod
     def create_user(data):
         try:
@@ -65,8 +67,8 @@ class UserController:
         db.session.commit()
 
     @staticmethod
-    def is_exist_username(user) -> bool:
-        return db.session.query.get(user.username) is not None
+    def is_exist_username(username) -> bool:
+        return User.query.filter_by(username=username).first() is not None
 
     @staticmethod
     def is_exist_phone_number(user) -> bool:
@@ -83,8 +85,6 @@ class UserController:
             return {"error": "Ancien mot de passe incorrect"}, 401
 
         try:
-
-            print(nouveau_password)
             auth.password_hash = bcrypt.generate_password_hash(nouveau_password).decode("utf-8")
 
             db.session.commit()

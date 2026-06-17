@@ -1,6 +1,5 @@
 import datetime
 from app import db
-from app.models import TypeCarte
 
 
 class Carte(db.Model):
@@ -21,7 +20,7 @@ class Carte(db.Model):
     compte = db.relationship('Compte',back_populates='cartes')
     type_carte = db.relationship('TypeCarte',back_populates='cartes')
 
-    def __init__(self, numero_carte:int, date_expiration:datetime, code_securite:int, type_carte:TypeCarte):
+    def __init__(self, numero_carte, date_expiration, code_securite, type_carte):
         self.numero_carte = numero_carte
         self.date_expiration = date_expiration
         self.code_securite = code_securite
@@ -45,8 +44,6 @@ class Carte(db.Model):
             "paiment_sans_contact": self.paiment_sans_contact,
             "paiment_en_ligne": self.paiment_en_ligne,
         }
-        print(self.type_carte)
-
         if not fields:
             return data
 

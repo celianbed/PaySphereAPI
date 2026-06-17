@@ -50,12 +50,11 @@ class CompteController:
             return None
 
     @staticmethod
-    def delete_compte(compte: Compte) -> User:
-        db.session.delete(compte.virements_recus)
-        db.session.commit()
-
-        db.session.delete(compte.virements_transfere)
-        db.session.commit()
+    def delete_compte(compte: Compte):
+        for virement in compte.virements_recus:
+            db.session.delete(virement)
+        for virement in compte.virements_envoyes:
+            db.session.delete(virement)
 
         db.session.delete(compte)
         db.session.commit()

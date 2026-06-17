@@ -36,14 +36,14 @@ class User(db.Model):
 
     client = db.relationship("Client", uselist=False, back_populates="user")
     authentification = db.relationship("Authentification", back_populates="user",uselist=False)
-    def __init__(self,id, nom, prenom, email, username, date_creation=datetime.now(), mise_a_jour_profile=None, active=True):
+    def __init__(self, id, nom, prenom, email, username, date_creation=None, mise_a_jour=None, active=True):
         self.id = id
         self.nom = nom
         self.prenom = prenom
         self.email = email
         self.username = username
-        self.date_creation = date_creation
-        self.mise_a_jour_profile = mise_a_jour_profile
+        self.date_creation = date_creation or datetime.now().date()
+        self.mise_a_jour = mise_a_jour
         self.active = active
 
     def __repr__(self):

@@ -1,7 +1,5 @@
 from sqlalchemy import DateTime
 from app import db
-from app.models import Statut, TypeVirement
-from ..models import Compte
 
 
 class Virement(db.Model):
@@ -24,7 +22,7 @@ class Virement(db.Model):
     statut = db.relationship('Statut',back_populates='virements')
 
 
-    def __init__(self, compte_source:Compte, compte_destination:Compte, montant, date_virement, statut:Statut,type_virement:TypeVirement):
+    def __init__(self, compte_source, compte_destination, montant, date_virement, statut, type_virement):
         self.compte_source = compte_source
         self.compte_destination = compte_destination
         self.montant = montant

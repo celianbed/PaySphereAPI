@@ -60,11 +60,12 @@ class ClientController:
             return e
 
     @staticmethod
-    def delete_client(client:Client) -> User:
-            db.session.delete()
-            db.session.delete()
-            db.session.commit()
-            return client
+    def delete_client(client: Client):
+        for compte in client.comptes:
+            CompteController.delete_compte(compte)
+        db.session.delete(client)
+        db.session.commit()
+        return client
 
     @staticmethod
     def get_client_by_numero(numero_client):

@@ -2,11 +2,6 @@ import random
 from datetime import datetime
 from typing import Tuple
 from app import db
-from app.models import Rib
-from app.models.Client import Client
-from app.models.Statut import Statut
-from app.models.TypeCompte import TypeCompte
-from app.models.Virement import Virement
 
 
 class Compte(db.Model):
@@ -18,7 +13,7 @@ class Compte(db.Model):
     statut_id =  db.Column(db.Integer, db.ForeignKey('statut.id'), nullable=False)
     numero_compte = db.Column(db.Integer,nullable=False)
     solde = db.Column(db.Numeric(15, 2), nullable=False, default=0.00)
-    date_ouverture = db.Column(db.Date, nullable=False, default=datetime.now().date())
+    date_ouverture = db.Column(db.Date, nullable=False, default=db.func.current_date())
 
 
     client = db.relationship("Client", uselist=False, back_populates="comptes")
@@ -26,16 +21,16 @@ class Compte(db.Model):
     type_compte = db.relationship("TypeCompte", back_populates="comptes")
     statut = db.relationship("Statut", back_populates="comptes")
     cartes = db.relationship("Carte", back_populates="compte")
-    virements_envoyes = db.relationship("Virement", foreign_keys=[Virement.compte_source_id],
+    virements_envoyes = db.relationship("Virement", foreign_keys="[Virement.compte_source_id]",
                                         back_populates="compte_source")
-    virements_recus = db.relationship("Virement", foreign_keys=[Virement.compte_destination_id],
+    virements_recus = db.relationship("Virement", foreign_keys="[Virement.compte_destination_id]",
                                       back_populates="compte_destination")
 
     rib = db.relationship("Rib",
                           back_populates="compte", uselist=False)
 
 
-    def __init__(self,client:Client, type_compte:TypeCompte, statut:Statut, solde=0.00, date_ouverture=None):
+    def __init__(self, client, type_compte, statut, solde=0.00, date_ouverture=None):
         self.client = client
         self.type_compte = type_compte
         self.solde = solde
@@ -92,7 +87,7 @@ class Compte(db.Model):
     def get_statut(self):
         return self.statut
 
-    def get_rib(self) -> Rib:
+    def get_rib(self):
         return self.rib
 
     def set_rib(self, rib):
@@ -101,7 +96,7 @@ class Compte(db.Model):
     def set_type_compte(self, type_compte):
         self.type_compte = type_compte
 
-    def get_type_compte(self) -> TypeCompte:
+    def get_type_compte(self):
         return self.type_compte
 
     def can_make_transfer(self, montant:float) -> Tuple[bool, str]:
@@ -124,11 +119,7 @@ class Compte(db.Model):
 
     @staticmethod
     def generer_num_compte():
-        num = 0
-        for i in range(0,6):
-            num += random.randint(0,9)
-
-        return num
+        return random.randint(100000, 999999)
 
 
 
