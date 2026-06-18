@@ -28,8 +28,22 @@ def create_virement():
 @api.route('/virement', methods=['GET'])
 @jwt_required()
 def get_virement():
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 20, type=int)
+    per_page = min(per_page, 100)
+
     virements = VirementController.get_all_virements()
-    return jsonify([v.to_dict() for v in virements]), 200
+    total = len(virements)
+    start = (page - 1) * per_page
+    end = start + per_page
+
+    return jsonify({
+        "data": [v.to_dict() for v in virements[start:end]],
+        "page": page,
+        "per_page": per_page,
+        "total": total,
+        "pages": (total + per_page - 1) // per_page
+    }), 200
 
 
 @api.route("/virements/verifie-beneficiaire", methods=["POST"])
