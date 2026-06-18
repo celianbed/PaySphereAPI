@@ -11,7 +11,7 @@ class Compte(db.Model):
     client_id = db.Column(db.Integer, db.ForeignKey('client.id'), nullable=False)
     type_compte_id = db.Column(db.Integer, db.ForeignKey('type_compte.id'), nullable=False)
     statut_id =  db.Column(db.Integer, db.ForeignKey('statut.id'), nullable=False)
-    numero_compte = db.Column(db.Integer,nullable=False)
+    numero_compte = db.Column(db.Integer, nullable=False, unique=True)
     solde = db.Column(db.Numeric(15, 2), nullable=False, default=0.00)
     date_ouverture = db.Column(db.Date, nullable=False, default=db.func.current_date())
 
@@ -104,7 +104,8 @@ class Compte(db.Model):
         Vérifie si le compte peut effectuer un virement du montant spécifié.
 
         :param montant: Montant du virement à vérifier.
-        :return: Tuple (bool, str). True si le virement est possible, False sinon avec un message d'explication.
+        :return: Tuple (bool, str). True si le virement est possible, 
+         False sinon avec un message d'explication.
         """
         if self.statut is None or self.statut.get_nom().lower() != "actif":
             return False, "Le compte n'est pas actif et ne peut pas effectuer de virement."
@@ -119,7 +120,12 @@ class Compte(db.Model):
 
     @staticmethod
     def generer_num_compte():
-        return random.randint(100000, 999999)
+        from app import db
+        for _ in range(100):
+            num = random.randint(10000000, 99999999)
+            if not db.session.query(Compte).filter_by(numero_compte=num).first():
+                return num
+        raise ValueError("Impossible de générer un numéro de compte unique")
 
 
 
