@@ -17,6 +17,16 @@ def home():
 def swagger():
     return redirect("/swagger")
 
+@api.route('/health')
+def health_check():
+    from app import db
+    try:
+        db.session.execute(db.text('SELECT 1'))
+        return jsonify({"status": "ok", "database": "connected"}), 200
+    except Exception:
+        return jsonify({"status": "error", "database": "disconnected"}), 503
+
+
 @api.app_errorhandler(404)
 def page_not_found(e):
     return jsonify({"erreur": "Ressource non trouvée"}), 404
