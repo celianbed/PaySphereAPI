@@ -13,3 +13,11 @@ class Config:
 
     JWT_BLACKLIST_ENABLED = True
     JWT_BLACKLIST_TOKEN_CHECKS = ["access", "refresh"]
+
+    JWT_ACCESS_HOURS = int(os.environ.get('JWT_ACCESS_HOURS', 1))
+    JWT_REFRESH_DAYS = int(os.environ.get('JWT_REFRESH_DAYS', 7))
+
+
+class TestConfig(Config):
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
