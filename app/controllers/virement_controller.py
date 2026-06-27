@@ -57,6 +57,12 @@ class VirementController :
 
 
         NotificationController.creer_notification(
+            client_id=compte_source.client.id,
+            type_notification="virement_envoye",
+            message=f"Virement de {montant:.2f} € envoyé à {compte_dest.client.prenom} {compte_dest.client.nom}"
+        )
+
+        NotificationController.creer_notification(
             client_id=compte_dest.client.id,
             type_notification="virement_recu",
             message=f"Vous avez reçu {montant:.2f} € de {compte_source.client.prenom} {compte_source.client.nom}"
