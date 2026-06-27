@@ -36,7 +36,7 @@ def get_client_by_id(client_id):
     return jsonify(client.to_dict(fields=fields_list)), 200
 
 
-@api.route('/clients/numero/<string:numero_client>', methods=['GET'])
+@api.route('/clients/numero/<int:numero_client>', methods=['GET'])
 @jwt_required()
 @handle_exceptions
 def get_client_by_numero(numero_client):

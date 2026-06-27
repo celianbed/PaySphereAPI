@@ -87,12 +87,18 @@ def check_if_token_is_blacklisted(jwt_header, jwt_data):
 @api.route('/verifier_code', methods=['POST'])
 @jwt_required()
 @limiter.limit("5 per minute")
+@handle_exceptions
 def verifier_code():
     data = request.json
     if not data or 'num' not in data or 'password' not in data:
         return jsonify({"erreur": "Données invalides"}), 400
 
-    client = ClientController.get_client_by_numero(data['num'])
+    try:
+        num_client = int(data['num'])
+    except (ValueError, TypeError):
+        return jsonify({"success": False}), 400
+
+    client = ClientController.get_client_by_numero(num_client)
     if not client or not client.user:
         return jsonify({"success": False}), 401
 
