@@ -6,3 +6,4 @@ from  .virement_route import *
 from .login_route import *
 from .carte_route import *
 from .notification_route import *
+from .pret_route import *

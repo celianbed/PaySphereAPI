@@ -30,8 +30,9 @@ class Pret(db.Model):
         return {
             "id": self.id,
             "client_id": self.client_id,
-            "montant_pret": self.montant_pret,
-            "taux_interet": self.taux_interet,
-            "date_demande": self.date_demande,
-            "date_echeance": self.date_echeance,
+            "montant_pret": float(self.montant_pret),
+            "taux_interet": float(self.taux_interet),
+            "date_demande": self.date_demande.strftime('%Y-%m-%d') if self.date_demande else None,
+            "date_echeance": self.date_echeance.strftime('%Y-%m-%d') if self.date_echeance else None,
+            "statut": self.statut,
         }

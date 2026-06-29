@@ -10,7 +10,7 @@ class Client(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), unique=True)
     nom = db.Column(db.String(100), nullable=False)
     prenom = db.Column(db.String(100), nullable=False)
-    num_client = db.Column(db.Integer,nullable=True)
+    num_client = db.Column(db.Integer, nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     adresse = db.Column(db.Text, nullable=False)
     numero_de_telephone = db.Column(db.String(20), nullable=False)
