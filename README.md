@@ -41,8 +41,28 @@ l'application refuse de démarrer si l'une manque ou si un secret fait moins de
 déconnexions aléatoires impossibles à diagnostiquer, puisque chaque worker
 signe alors avec une clé différente.
 
-Toutes les variables sont décrites dans [.env.example](.env.example) et
-déclarées dans [render.yaml](render.yaml).
+Toutes les variables sont décrites dans [.env.example](.env.example).
+
+### Variables à définir sur l'hébergeur
+
+| Variable | Valeur | Obligatoire |
+|---|---|---|
+| `DATABASE_URL` | chaîne de connexion Neon | oui |
+| `SECRET_KEY` | 32 caractères minimum | oui |
+| `JWT_SECRET_KEY` | 32 caractères minimum, différente de la précédente | oui |
+| `FLASK_APP` | `wsgi.py` — requis par `flask db upgrade` | oui |
+| `API_KEY` | clé attendue dans `X-API-Key`, vide pour désactiver | non |
+| `ALLOWED_ORIGINS` | vide : l'API n'est consommée que par l'app mobile | non |
+| `JWT_ACCESS_HOURS` | `1` | non |
+| `JWT_REFRESH_DAYS` | `7` | non |
+
+Commandes du service :
+
+```
+Build   : pip install -r requirements.txt && flask db upgrade
+Start   : gunicorn wsgi:app --bind 0.0.0.0:$PORT --workers 2 --access-logfile -
+Health  : /PaySphereAPI/health
+```
 
 ## Tests
 
@@ -81,10 +101,12 @@ Principes appliqués :
 
 ## Déploiement
 
-Hébergement : [Render](https://render.com), décrit dans
-[render.yaml](render.yaml).
+Hébergement : [Render](https://render.com). Le service est configuré
+directement depuis le tableau de bord ; les variables et les commandes
+attendues sont listées plus haut.
 
-Le déploiement automatique de Render est désactivé. La mise en production est
+Le déploiement automatique de Render doit être désactivé
+(Settings → Build & Deploy → Auto-Deploy = Off). La mise en production est
 déclenchée par le workflow [`ci.yml`](.github/workflows/ci.yml), uniquement sur
 `main` et uniquement après réussite des tests, de l'analyse de sécurité et de la
 construction de l'image Docker. Le workflow attend ensuite que la nouvelle
