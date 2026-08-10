@@ -1,30 +1,115 @@
-name: CI
+name: CI/CD
 
+# Le déploiement ne doit jamais partir avant que les tests aient réussi.
+# L'auto-déploiement de Render doit donc être désactivé (Settings > Build &
+# Deploy > Auto-Deploy = Off) : c'est le job `deploiement` ci-dessous qui
+# déclenche la mise en production, via le secret RENDER_DEPLOY_HOOK.
 on:
   push:
-    branches: [main]
+    branches: [main, develop]
   pull_request:
-    branches: [main]
+    branches: [main, develop]
+
+# Un push qui en remplace un autre annule la exécution précédente.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: '3.11.9'
 
 jobs:
-  test:
+  tests:
+    name: Tests et couverture
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
 
-      - name: Install dependencies
+      - name: Installation des dépendances
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
 
-      - name: Run tests
-        run: pytest -v --tb=short --cov=app --cov-report=term-missing
+      - name: Campagne de tests
+        run: pytest -v --tb=short --cov=app --cov-report=term-missing --cov-fail-under=65
 
-      - name: Check coverage threshold
-        run: pytest --cov=app --cov-fail-under=60 -q
+  securite:
+    name: Analyse de sécurité
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+
+      - name: Installation des dépendances
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      # Analyse statique : détecte notamment les secrets en dur, l'usage de
+      # `debug=True` et les requêtes SQL construites par concaténation.
+      - name: Analyse statique du code (bandit)
+        run: bandit -r app config.py wsgi.py -ll
+
+      # Vulnérabilités publiées sur les dépendances. Échoue si une CVE connue
+      # touche une version épinglée.
+      - name: Vulnérabilités des dépendances (pip-audit)
+        run: pip-audit -r requirements.txt --progress-spinner=off
+
+  image:
+    name: Construction de l'image Docker
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Vérifie que l'environnement conteneurisé reste constructible et que le
+      # service répond réellement à sa sonde de santé.
+      - name: Construction et démarrage de la pile
+        run: docker compose up --build --detach --wait --wait-timeout 120
+
+      - name: Vérification de la sonde de santé
+        run: curl -fsS http://localhost:5000/PaySphereAPI/health
+
+      - name: Journaux en cas d'échec
+        if: failure()
+        run: docker compose logs
+
+      - name: Arrêt de la pile
+        if: always()
+        run: docker compose down --volumes
+
+  deploiement:
+    name: Déploiement sur Render
+    needs: [tests, securite, image]
+    # Uniquement sur main, et jamais depuis une pull request.
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Déclenchement du déploiement
+        run: curl -fsS --retry 3 "${{ secrets.RENDER_DEPLOY_HOOK }}"
+
+      # Render redéploie de façon asynchrone : on attend que la nouvelle
+      # instance réponde avant de considérer le déploiement réussi.
+      - name: Attente de la remise en service
+        run: |
+          for tentative in $(seq 1 30); do
+            if curl -fsS --max-time 90 https://paysphereapi.onrender.com/PaySphereAPI/health; then
+              echo "Déploiement confirmé."
+              exit 0
+            fi
+            echo "Tentative $tentative : service pas encore disponible."
+            sleep 20
+          done
+          echo "Le service n'a pas répondu après le déploiement."
+          exit 1

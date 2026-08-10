@@ -1,0 +1,33 @@
+# Rien de ce qui suit ne doit entrer dans l'image : contexte de build plus
+# léger, et surtout aucun secret ni environnement local embarqué.
+
+.git
+.github
+.gitignore
+
+.env
+.flaskenv
+venv/
+.venv/
+env/
+
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+
+.idea/
+.vscode/
+.claude/
+
+.DS_Store
+Thumbs.db
+
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+*.md
+!README.md

@@ -1,0 +1,55 @@
+# Environnement de développement local reproduisant la production :
+# une API Gunicorn derrière PostgreSQL, avec les mêmes versions et la même
+# procédure de migration que sur Render.
+#
+#   docker compose up --build     démarre la base puis l'API
+#   docker compose run --rm api flask db upgrade    applique les migrations
+#   docker compose run --rm api python seed.py      charge le jeu d'essai
+#   docker compose run --rm api pytest              exécute les tests
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: paysphere
+      POSTGRES_PASSWORD: paysphere
+      POSTGRES_DB: paysphere
+    volumes:
+      - donnees_postgres:/var/lib/postgresql/data
+    # L'API attend que la base réponde réellement, et non que le conteneur
+    # soit simplement démarré.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U paysphere -d paysphere"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    # Port exposé pour pouvoir inspecter la base avec un client externe.
+    ports:
+      - "5433:5432"
+
+  api:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      FLASK_APP: wsgi.py
+      DATABASE_URL: postgresql://paysphere:paysphere@db:5432/paysphere
+      # Secrets de développement uniquement : la production utilise les
+      # valeurs définies dans le tableau de bord Render.
+      SECRET_KEY: developpement-uniquement-0123456789abcdef0123456789abcdef
+      JWT_SECRET_KEY: developpement-uniquement-fedcba9876543210fedcba9876543210
+      ALLOWED_ORIGINS: ""
+      API_KEY: ""
+      JWT_ACCESS_HOURS: 1
+      JWT_REFRESH_DAYS: 7
+    ports:
+      - "5000:5000"
+    # Les migrations sont appliquées avant le démarrage du serveur, comme en
+    # production.
+    command: >
+      sh -c "flask db upgrade &&
+             gunicorn wsgi:app --bind 0.0.0.0:5000 --workers 2 --access-logfile -"
+
+volumes:
+  donnees_postgres:

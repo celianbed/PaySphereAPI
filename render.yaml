@@ -1,15 +1,63 @@
+# Description de l'infrastructure de production.
+#
+# Toutes les variables consommées par l'application sont déclarées ici, y
+# compris celles dont la valeur reste saisie dans le tableau de bord
+# (`sync: false`). Une variable connue seulement du tableau de bord est une
+# variable que personne ne peut retrouver en lisant le dépôt, et que la
+# recréation du service perd silencieusement.
+#
+# autoDeploy est désactivé : la mise en production est déclenchée par le job
+# `deploiement` de .github/workflows/ci.yml, une fois les tests et l'analyse
+# de sécurité passés.
+
 services:
   - type: web
     name: paysphere-api
     runtime: python
+    branch: main
+    autoDeploy: false
+
     buildCommand: pip install -r requirements.txt && flask db upgrade
-    startCommand: gunicorn wsgi:app --bind 0.0.0.0:$PORT
+    # Sur une offre payante, préférer déplacer la migration ici afin qu'elle
+    # s'exécute après un build réussi et non pendant :
+    # preDeployCommand: flask db upgrade
+
+    startCommand: gunicorn wsgi:app --bind 0.0.0.0:$PORT --workers 2 --access-logfile -
+
+    # Utilisée par Render pour valider un déploiement, et par la supervision
+    # externe qui maintient l'instance éveillée.
+    healthCheckPath: /PaySphereAPI/health
+
     envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+
+      # Requise par la commande `flask db upgrade`.
+      - key: FLASK_APP
+        value: wsgi.py
+
+      # Chaîne de connexion Neon : saisie dans le tableau de bord.
       - key: DATABASE_URL
         sync: false
+
+      # Générés une fois par Render puis conservés entre les déploiements.
+      # L'application refuse de démarrer s'ils sont absents.
       - key: SECRET_KEY
         generateValue: true
       - key: JWT_SECRET_KEY
         generateValue: true
-      - key: PYTHON_VERSION
-        value: 3.11.9
+
+      # Clé attendue dans X-API-Key. Embarquée dans l'application mobile, donc
+      # extractible : elle filtre le trafic automatisé, elle n'authentifie pas.
+      - key: API_KEY
+        sync: false
+
+      # Aucune origine navigateur autorisée : l'API n'est consommée que par
+      # l'application mobile, qui n'est pas soumise au CORS.
+      - key: ALLOWED_ORIGINS
+        value: ""
+
+      - key: JWT_ACCESS_HOURS
+        value: "1"
+      - key: JWT_REFRESH_DAYS
+        value: "7"

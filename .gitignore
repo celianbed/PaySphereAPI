@@ -15,6 +15,12 @@ dist/
 build/
 *.egg
 
+# Tests et couverture
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
 # IDE
 .idea/
 .vscode/

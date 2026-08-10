@@ -16,8 +16,6 @@ Base URL: `/PaySphereAPI`
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| GET | `/users` | JWT | Liste des utilisateurs |
-| POST | `/users` | JWT | Créer un utilisateur |
 | GET | `/users/<id>` | JWT | Détails d'un utilisateur (owner only) |
 | PATCH | `/users/<id>` | JWT | Modifier un utilisateur (owner only) |
 | DELETE | `/users/<id>` | JWT | Supprimer un utilisateur (owner only) |
@@ -37,8 +35,8 @@ Base URL: `/PaySphereAPI`
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| GET | `/comptes` | JWT | Liste des comptes |
-| POST | `/comptes` | JWT | Créer un compte |
+| GET | `/comptes` | JWT | Comptes du client connecté |
+| POST | `/comptes` | JWT | Ouvrir un compte pour le client connecté |
 | GET | `/comptes/<id>` | JWT | Détails d'un compte (owner only) |
 
 ## Virements
@@ -46,7 +44,7 @@ Base URL: `/PaySphereAPI`
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
 | POST | `/virement` | JWT | Effectuer un virement |
-| GET | `/virement?page=1&per_page=20` | JWT | Liste des virements (paginé) |
+| GET | `/virement?page=1&per_page=20` | JWT | Virements du client connecté (paginé) |
 | POST | `/virements/verifie-beneficiaire` | JWT | Vérifier un IBAN bénéficiaire |
 
 ## Cartes
@@ -70,7 +68,7 @@ Base URL: `/PaySphereAPI`
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| GET | `/notifications` | JWT | Liste des notifications |
+| GET | `/notifications` | JWT | Notifications du client connecté |
 | POST | `/notifications/<id>/lu` | JWT | Marquer comme lue |
 
 ## Monitoring
@@ -78,6 +76,21 @@ Base URL: `/PaySphereAPI`
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
 | GET | `/health` | - | Status de l'API et de la BDD |
+
+## Règles d'accès
+
+Toute route marquée « owner only » ne retourne la ressource que si elle
+appartient au porteur du jeton. Les vérifications sont centralisées dans
+`app/utils/authz.py` et couvertes par `tests/test_authorization.py`.
+
+Une ressource inexistante et une ressource appartenant à un autre client
+renvoient la **même** réponse `404`. Distinguer les deux cas permettrait
+d'énumérer les identifiants valides.
+
+Les routes `GET /users` (liste de tous les utilisateurs) et `POST /users`
+(création arbitraire) ont été retirées : sans modèle de rôles, elles
+exposaient les données de tous les clients à n'importe quel porteur de jeton.
+La création de compte passe exclusivement par `POST /register`.
 
 ## Headers requis
 
