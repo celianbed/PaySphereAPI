@@ -1,0 +1,13 @@
+# Outils de test et d'analyse, installés en développement et en intégration
+# continue mais absents de l'image de production.
+#
+#   pytest                          exécute la campagne de tests
+#   bandit -r app config.py wsgi.py analyse statique de sécurité du code
+#   pip-audit -r requirements.txt   vulnérabilités connues des dépendances
+
+-r requirements.txt
+
+pytest>=8.0
+pytest-cov>=5.0
+bandit>=1.7
+pip-audit>=2.7
