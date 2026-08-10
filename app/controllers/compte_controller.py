@@ -13,7 +13,27 @@ class CompteController:
 
     @staticmethod
     def get_all_comptes():
+        """
+        Retourne tous les comptes, tous clients confondus.
+
+        Réservé aux traitements internes (scripts, tâches d'administration) :
+        aucune route exposée ne doit l'appeler. Pour répondre à un client
+        authentifié, utiliser :meth:`get_comptes_by_client`.
+        """
         return Compte.query.all()
+
+    @staticmethod
+    def get_comptes_by_client(client_id):
+        """
+        Retourne les comptes appartenant à un client donné.
+
+        :param client_id: Identifiant du client propriétaire.
+        :return: Liste des comptes du client, triée par identifiant.
+        """
+        return (Compte.query
+                .filter(Compte.client_id == client_id)
+                .order_by(Compte.id)
+                .all())
 
     @staticmethod
     def get_compte_by_id(compte_id):

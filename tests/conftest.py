@@ -139,3 +139,45 @@ def auth_headers_user2(app, user2):
     with app.app_context():
         token = create_access_token(identity=str(user2['user'].id))
     return {'Authorization': f'Bearer {token}', 'Content-Type': 'application/json'}
+
+
+def _headers_for(app, user):
+    with app.app_context():
+        token = create_access_token(identity=str(user['user'].id))
+    return {'Authorization': f'Bearer {token}', 'Content-Type': 'application/json'}
+
+
+@pytest.fixture
+def scenario_ids_alignes(app, db, seed_refs):
+    """
+    Scénario où l'identifiant de l'attaquant est égal à celui du compte visé.
+
+    Le contrôle d'autorisation des virements comparait ``from_account`` (un
+    identifiant de *compte*) avec l'identité du porteur du jeton (un identifiant
+    d'*utilisateur*). Tant que ces deux valeurs diffèrent, le contrôle paraît
+    correct : c'est pourquoi les tests existants passaient. La faille
+    n'apparaît que lorsqu'elles coïncident.
+
+    On force donc cette coïncidence en créant l'attaquant en premier, de sorte
+    que la séquence d'auto-incrément attribue au compte de la victime un
+    identifiant égal à celui de l'utilisateur attaquant. L'assertion en fin de
+    fixture garantit que le scénario reste valide si les fixtures évoluent.
+
+    :return: Un dictionnaire ``{'victime', 'attaquant', 'headers_attaquant'}``.
+    """
+    attaquant = _make_user(db, seed_refs, 2, "Martin", "Sophie",
+                           "sophie@test.com", "smartin", 10002)
+    victime = _make_user(db, seed_refs, 1, "Dupont", "Jean",
+                         "jean@test.com", "jdupont", 10001)
+
+    assert victime['compte'].id == attaquant['user'].id, (
+        "Le scénario suppose que l'identifiant du compte de la victime est égal "
+        "à celui de l'utilisateur attaquant ; sans cette coïncidence le test ne "
+        "démontre plus rien."
+    )
+
+    return {
+        'victime': victime,
+        'attaquant': attaquant,
+        'headers_attaquant': _headers_for(app, attaquant),
+    }

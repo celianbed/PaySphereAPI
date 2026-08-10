@@ -32,11 +32,17 @@ class Carte(db.Model):
 
 
     def to_dict(self, fields=None) -> dict:
+        """
+        Représentation de la carte destinée aux réponses de l'API.
+
+        Le cryptogramme visuel (``code_securite``) est volontairement absent :
+        la norme PCI-DSS interdit de le restituer, et aucun écran de
+        l'application ne l'affiche.
+        """
         data = {
             "id": self.id,
             "numero_carte": self.numero_carte,
             "date_expiration": self.date_expiration,
-            "code_securite": self.code_securite,
             "type_carte": self.type_carte.to_dict(),
             "numero_compte" : self.compte.numero_compte,
             "active": self.active,

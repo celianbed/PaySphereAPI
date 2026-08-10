@@ -93,13 +93,16 @@ class TestVirementEndpoint:
         assert data['success'] is True
 
     def test_create_virement_unauthorized(self, client, user1, user2, auth_headers_user2):
+        # 404 et non 403 : distinguer « compte inexistant » de « compte d'un
+        # tiers » permettrait d'énumérer les identifiants de comptes valides.
+        # Le cloisonnement complet est vérifié dans tests/test_authorization.py.
         resp = client.post('/PaySphereAPI/virement', json={
             'from_account': user1['compte'].id,
             'to_account_iban': user2['rib'].iban,
             'montant': 200.00,
             'type_virement': 1,
         }, headers=auth_headers_user2)
-        assert resp.status_code == 403
+        assert resp.status_code == 404
 
     def test_verify_beneficiaire_exists(self, client, user2, auth_headers):
         resp = client.post('/PaySphereAPI/virements/verifie-beneficiaire', json={
