@@ -72,6 +72,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Espionner le docker-compose sur la CI
+        run: cat docker-compose.yml
+        
+      - name: Vérifier si un .env parasite traîne
+        run: ls -la
+
       # Vérifie que l'environnement conteneurisé reste constructible et que le
       # service répond réellement à sa sonde de santé.
       - name: Construction et démarrage de la pile
