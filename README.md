@@ -8,7 +8,7 @@ Application cliente : [PaySphereApp](https://github.com/celianbed/PaySphereApp) 
 ## Démarrage rapide avec Docker
 
 L'environnement conteneurisé reproduit la production : même version de Python,
-même serveur WSGI, même procédure de migration..
+même serveur WSGI, même procédure de migration.
 
 ```bash
 docker compose up --build
