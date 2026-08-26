@@ -72,15 +72,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Vérifie que l'environnement conteneurisé reste constructible et que le
-      # service répond réellement à sa sonde de santé.
-      - name: Construction et démarrage de la pile
-        run: docker compose up --build --detach --wait --wait-timeout 120
-        
       - name: Créer le fichier .env pour Docker
         run: |
           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
           echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> .env
+
+      - name: Construction et démarrage de la pile
+        run: docker compose up --build --detach --wait --wait-timeout 120
 
       - name: Vérification de la sonde de santé
         run: curl -fsS http://localhost:5000/PaySphereAPI/health
