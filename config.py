@@ -28,6 +28,8 @@ class ConfigurationError(RuntimeError):
 
 class Config:
     _db_url = os.environ.get('DATABASE_URL', '')
+
+    DATABASE_URL = _db_url
     SQLALCHEMY_DATABASE_URI = _db_url.replace('postgresql://', 'postgresql+psycopg://', 1) if _db_url else None
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
