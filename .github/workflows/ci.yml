@@ -31,6 +31,12 @@ jobs:
           cache: pip
           cache-dependency-path: requirements-dev.txt
 
+      - name: Créer le fichier .env pour Docker
+        run: |
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
+          echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> .env
+
+
       - name: Installation des dépendances
         run: |
           python -m pip install --upgrade pip
